@@ -1,0 +1,9 @@
+platform
+socket
+re
+uuid
+json
+psutil
+logging
+py-cpuinfo
+GPUtil

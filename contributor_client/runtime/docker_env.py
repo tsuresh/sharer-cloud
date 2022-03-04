@@ -1,8 +1,6 @@
 import docker
 from contributor_client.config import configs
 
-print(configs)
-
 #chosen environments @TODO make it choosable
 environments = ['busybox']
 
