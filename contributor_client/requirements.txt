@@ -7,3 +7,4 @@ psutil
 logging
 py-cpuinfo
 GPUtil
+pyyaml

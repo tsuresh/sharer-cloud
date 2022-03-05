@@ -1,0 +1,14 @@
+name: tensorflow-workload
+version: 1.0
+spec:
+  image: ubuntu,
+  cpu_count: 1,
+  cpu_percent: 1,
+  device_requests:
+    - 3dsnow
+  resultType: rawOut
+  start_commands:
+    - python3 main.py
+  envars:
+    - variable1 : test
+    - variable2 : test

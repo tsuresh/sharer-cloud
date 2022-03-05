@@ -1,6 +1,7 @@
 {
-    "images" : [],
+    "images" : ["busybox"],
     "cpu_count" : 1,
-    "cpu_percent" : 100.0,
-    "device_requests" : []
+    "cpu_percent" : 100,
+    "mem_limit": "1g",
+    "device_requests" : ["3dsnow"]
 }
