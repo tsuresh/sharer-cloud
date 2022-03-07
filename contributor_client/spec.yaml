@@ -1,7 +1,7 @@
 name: tensorflow-workload
 version: 1.0
 spec:
-  image: busybox
+  image: intel/intel-optimized-ml:scikit-learn
   cpu_count: 1
   cpu_percent: 1
   device_requests:

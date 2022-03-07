@@ -20,16 +20,17 @@ def pullImages(configs: object):
 # Create the container under the given system boundaries
 def create(name: str, image: str, deployCmd: list, envars: list, configs: object):
     try:
-        container = client.containers.create(
-            name= name,
+        container = client.containers.run(
             image= image,
-            command= deployCmd,
+            #command= "/bin/bash mkdir test",
+            name= name,
             cpu_count= configs.cpu_count or 1,
             cpu_percent= configs.cpu_percent or 100,
             #device_requests= configs.device_requests,
             mem_limit= configs.mem_limit,
             environment= envars,
-            labels= [containerLabel]
+            labels= [containerLabel],
+            auto_remove= True,
         )
         print("Container created")
         print(container)
@@ -39,19 +40,17 @@ def create(name: str, image: str, deployCmd: list, envars: list, configs: object
         return False
 
 # Starts the container and execute the initial commands
-def start(name: str, cmd: list):
+def start(name: str, image: str, cmd: list):
+    print("Container starting...")
     try:
-        container = client.containers.run(
-            name= name,
-            command= cmd,
-            auto_remove= True,
-        )
+        container = client.containers.get(name).start()
         print("Container logs")
         print(container)
         return container
-    except:
-        print("Unable to start container")
-        return "Unable to start container"
+    except Exception as e:
+        print("Error starting the container")
+        print(e)
+        return False
 
 # Get a list of all running workloads
 def getRunningWorkloads():
@@ -63,6 +62,6 @@ def getRunningWorkloads():
             }
         )
         return workloads
-    except:
-        print("Unable to get containers")
+    except Exception as e:
+        print(e)
         return []

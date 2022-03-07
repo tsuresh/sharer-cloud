@@ -12,20 +12,25 @@ def placeWorkloads(payloadId, payloadUrl, spec, config):
     containerStatus = runtime.docker_env.create(
         "sharercloud-wl-" + payloadId,
         parsedSpec["image"],
-        ["mkdir sc_wl_" + payloadId, "cd sc_wl_" + payloadId, "wget " + payloadUrl, "unzip " + str(payloadId) + ".zip"],
+        #["mkdir sc_wl_" + payloadId, "cd sc_wl_" + payloadId, "wget " + payloadUrl, "unzip " + str(payloadId) + ".zip"],
+        ["echo test"],
         parsedSpec["envars"],
         config
     )
 
+    print(containerStatus)
+
     #start deploy commands
-    if containerStatus is True:
-        resultLog = runtime.docker_env.start(
-            "sharercloud-wl-" + payloadId,
-            parsedSpec["start_commands"]
-        )
-        print("Got the final result" + resultLog)
-    else:
-        print("Unable to create the container")
+    # if containerStatus is True:
+    #     resultLog = runtime.docker_env.start(
+    #         "sharercloud-wl-" + payloadId,
+    #         parsedSpec["image"],
+    #         parsedSpec["start_commands"]
+    #     )
+    #     print("Got the final result")
+    #     print(resultLog)
+    # else:
+    #     print("Unable to create the container")
 
     #pass result to frontend
 
