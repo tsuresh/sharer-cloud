@@ -1,4 +1,5 @@
 import docker
+import os
 
 # Retrive docker status
 try:
@@ -10,7 +11,7 @@ containerLabel = "sharercloud-wl"
 
 # Pull the user prefered images
 def pullImages(configs: object):
-    for environment in configs.environments:
+    for environment in configs.images:
         if environment not in client.images.list():
             print("Fetching image..." + environment)
             client.images.pull(environment)
@@ -18,33 +19,32 @@ def pullImages(configs: object):
     return True
 
 # Create the container under the given system boundaries
-def create(name: str, image: str, deployCmd: list, envars: list, configs: object):
+def create(name: str, image: str, envars: list, deployCmd: str, configs: object):
+    print("Container creating...")
     try:
         container = client.containers.run(
-            image= image,
-            #command= "/bin/bash mkdir test",
+            image,
+            command= ["/bin/sh", "-c", deployCmd],
             name= name,
             cpu_count= configs.cpu_count or 1,
             cpu_percent= configs.cpu_percent or 100,
             #device_requests= configs.device_requests,
             mem_limit= configs.mem_limit,
             environment= envars,
-            labels= [containerLabel],
-            auto_remove= True,
+            labels= [containerLabel]
         )
         print("Container created")
-        print(container)
-        return True
+        return container
     except Exception as e:
         print(e)
         return False
 
 # Starts the container and execute the initial commands
-def start(name: str, image: str, cmd: list):
+def start(name: str):
     print("Container starting...")
     try:
         container = client.containers.get(name).start()
-        print("Container logs")
+        print("Container logs..")
         print(container)
         return container
     except Exception as e:
@@ -54,6 +54,7 @@ def start(name: str, image: str, cmd: list):
 
 # Get a list of all running workloads
 def getRunningWorkloads():
+    print("Getting workloads...")
     try:
         workloads = client.containers.list(
             filters={
@@ -65,3 +66,15 @@ def getRunningWorkloads():
     except Exception as e:
         print(e)
         return []
+
+# Add files via cmd
+def addArtefacts(container_name, dst, data):
+    print("Adding artefacts...")
+    try:
+        container = client.containers.get(container_name)
+        print(container)
+        print(os.path.dirname(dst))
+        container.put_archive(container_name, os.path.dirname(dst), data)
+    except Exception as e:
+        print(e)
+        return False

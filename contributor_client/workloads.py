@@ -2,37 +2,69 @@ from queue import Empty
 import yaml
 import config
 import runtime.docker_env
+import requests
+import os
 
 #place workloads within running containers
 def placeWorkloads(payloadId, payloadUrl, spec, config):
 
     parsedSpec = parseSpec(spec)
 
+    startCommands = ' && '.join(parsedSpec["start_commands"]);
+
+    #pull missing images
+    #runtime.docker_env.pullImages(config)
+
     #create a container and deploy the workload
     containerStatus = runtime.docker_env.create(
         "sharercloud-wl-" + payloadId,
         parsedSpec["image"],
-        #["mkdir sc_wl_" + payloadId, "cd sc_wl_" + payloadId, "wget " + payloadUrl, "unzip " + str(payloadId) + ".zip"],
-        ["echo test"],
         parsedSpec["envars"],
+        "apt-get install unzip && mkdir sc_wl_{payloadId} && cd sc_wl_{payloadId} && wget {payloadUrl} && unzip {payloadId}.zip && {startCommands}".format(payloadId=payloadId, payloadUrl=payloadUrl, startCommands=startCommands),
         config
     )
 
-    print(containerStatus)
+    if containerStatus != False:
+        #container result
+        print(containerStatus)
 
-    #start deploy commands
-    # if containerStatus is True:
-    #     resultLog = runtime.docker_env.start(
-    #         "sharercloud-wl-" + payloadId,
-    #         parsedSpec["image"],
-    #         parsedSpec["start_commands"]
-    #     )
-    #     print("Got the final result")
-    #     print(resultLog)
-    # else:
-    #     print("Unable to create the container")
+    # resultLog = runtime.docker_env.start(
+    #     "sharercloud-wl-" + payloadId
+    # )
+    # print("Got the final result")
+    # print(resultLog)
 
     #pass result to frontend
+
+def deployArtefacts(url: str, container_name: str):
+
+    dest_folder = "./artefacts"
+
+    if not os.path.exists(dest_folder):
+        os.makedirs(dest_folder)
+
+    filename = url.split('/')[-1].replace(" ", "_")
+    file_path = os.path.join(dest_folder, filename)
+
+    r = requests.get(url, stream=True)
+    if r.ok:
+        print("saving to", os.path.abspath(file_path))
+        with open(file_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024 * 8):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
+                    os.fsync(f.fileno())
+
+        dst = "{container_name}:/var/{file_name}".format(container_name=container_name, file_name=filename)
+        print(dst)
+
+        data = open(file_path, 'rb').read()
+        status = runtime.docker_env.addArtefacts(container_name, dst, data)
+        print(status)
+
+    else:
+        print("Download failed: status code {}\n{}".format(r.status_code, r.text))
 
 def checkPlaceability(spec, config):
 
@@ -123,12 +155,12 @@ def getYamlConfig():
         except yaml.YAMLError as exc:
             print(exc)
 
-placeability = checkPlaceability(
-    getYamlConfig(),
-    config.configs
-)
+# placeability = checkPlaceability(
+#     getYamlConfig(),
+#     config.configs
+# )
 
-print(placeability)
+# print(placeability)
 
 placement = placeWorkloads(
     "123456",
@@ -137,3 +169,4 @@ placement = placeWorkloads(
     config.configs
 )
 
+print(placement)
