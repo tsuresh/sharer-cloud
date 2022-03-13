@@ -1,6 +1,6 @@
+from ast import Str
 from queue import Empty
 import yaml
-import config
 import runtime.docker_env
 import requests
 import os
@@ -13,10 +13,10 @@ def placeWorkloads(payloadId, payloadUrl, spec, config):
     startCommands = ' && '.join(parsedSpec["start_commands"]);
 
     #pull missing images
-    #runtime.docker_env.pullImages(config)
+    runtime.docker_env.pullImages(config)
 
     #create a container and deploy the workload
-    containerStatus = runtime.docker_env.create(
+    containerLogs = runtime.docker_env.create(
         "sharercloud-wl-" + payloadId,
         parsedSpec["image"],
         parsedSpec["envars"],
@@ -24,17 +24,11 @@ def placeWorkloads(payloadId, payloadUrl, spec, config):
         config
     )
 
-    if containerStatus != False:
-        #container result
-        print(containerStatus)
+    if containerLogs != False:
+        print(containerLogs)
+    else:
+        return containerLogs
 
-    # resultLog = runtime.docker_env.start(
-    #     "sharercloud-wl-" + payloadId
-    # )
-    # print("Got the final result")
-    # print(resultLog)
-
-    #pass result to frontend
 
 def deployArtefacts(url: str, container_name: str):
 
@@ -66,7 +60,7 @@ def deployArtefacts(url: str, container_name: str):
     else:
         print("Download failed: status code {}\n{}".format(r.status_code, r.text))
 
-def checkPlaceability(spec, config):
+def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, deviceToken=None):
 
     parsedSpec = parseSpec(spec)
 
@@ -75,7 +69,10 @@ def checkPlaceability(spec, config):
         print("Incompatible image")
         return {
             'status' : False,
-            'message' : 'Incompatible image'
+            'message' : 'Incompatible image',
+            'sid' : sid,
+            'token' : deviceToken,
+            'workload_id' : workloadId
         }
 
     #Check if there's existing processes
@@ -83,7 +80,10 @@ def checkPlaceability(spec, config):
         print("There are existing processes running")
         return {
             'status' : False,
-            'message' : 'There are existing processes running'
+            'message' : 'There are existing processes running',
+            'sid' : sid,
+            'token' : deviceToken,
+            'workload_id' : workloadId
         }
 
     #Check if the spec matches the hardware
@@ -92,7 +92,10 @@ def checkPlaceability(spec, config):
             print("Required CPU count is not sufficient")
             return {
                 'status' : False,
-                'message' : 'Required CPU count is not sufficient'
+                'message' : 'Required CPU count is not sufficient',
+                'sid' : sid,
+                'token' : deviceToken,
+                'workload_id' : workloadId
             }
 
     #Check for CPU percentage allocation
@@ -101,7 +104,10 @@ def checkPlaceability(spec, config):
             print("Required CPU percentage is not sufficient")
             return {
                 'status' : False,
-                'message' : 'Required CPU percentage is not sufficient'
+                'message' : 'Required CPU percentage is not sufficient',
+                'sid' : sid,
+                'token' : deviceToken,
+                'workload_id' : workloadId
             }
 
     #Check for special requests
@@ -109,12 +115,18 @@ def checkPlaceability(spec, config):
         print("Required special features are not available in device")
         return {
             'status' : False,
-            'message' : 'Required special features are not available in device'
+            'message' : 'Required special features are not available in device',
+            'sid' : sid,
+            'token' : deviceToken,
+            'workload_id' : workloadId
         }
     
     return {
         'status' : True,
-        'message' : 'Container is ready to be scheduled'
+        'message' : 'Container is ready to be scheduled',
+        'sid' : sid,
+        'token' : deviceToken,
+        'workload_id' : workloadId
     }
 
 def parseSpec(parsedSpec):
@@ -162,11 +174,11 @@ def getYamlConfig():
 
 # print(placeability)
 
-placement = placeWorkloads(
-    "123456",
-    "https://inforwaves.com/",
-    getYamlConfig(),
-    config.configs
-)
+# placement = placeWorkloads(
+#     "123456",
+#     "https://inforwaves.com/",
+#     getYamlConfig(),
+#     config.configs
+# )
 
-print(placement)
+# print(placement)
