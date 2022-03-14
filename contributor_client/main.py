@@ -29,6 +29,16 @@ def disconnect():
     print("Disconnected from socket")
 
 # Listen to spec check requests
+@sio.on('vacantCheck', namespace='/'+config.configs.machine_type)
+def catch_vacant_check():
+    vacant_status = workloads.checkMachineVacantStatus(
+        config.configs, 
+        sio.sid, 
+        device_token
+    )
+    sio.emit('vacantCheckResp', vacant_status)
+
+# Listen to spec check requests
 @sio.on('specCheck')
 def catch_spec_check(data):
     placeability = workloads.checkPlaceability(

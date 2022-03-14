@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO
 import members
 import workloads
+import jobqueue
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -32,23 +33,58 @@ def join_network():
     return jsonify(response_content)
 
 # Broadcast status check request over the network
-@app.route('/getClients', methods=['POST'])
-def getClients():
-    response_content = None
-    request_json = request.get_json()
-    workload_id = request_json.get('workload_id')
-    spec = request_json.get('spec')
-    socketio.emit('specCheck', {
-        'workload_id' : workload_id,
-        'spec' : spec
-    })
-    response_content = {
-        "message" : "success",
-        "device_token" : "test"
-    }
-    return jsonify(response_content)
+def getClients(workload_id, spec):
+    try:
+        socketio.emit('specCheck', {
+            'workload_id' : workload_id,
+            'spec' : spec
+        })
+        print("Spec check request broadcasted over network")
+        return True
+    except Exception as e:
+        print(e)
+        return False
 
-#Re
+# Status update from a given machine type
+def getVacantClients(machine_type):
+    try:
+        socketio.emit('vacantCheck', namespace='/'+str(machine_type))
+        print("Vacant check request broadcasted over network")
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+# Request received when a client machine responds its vacancy
+@socketio.on('vacantCheckResp')
+def vacantCheckResp(data):
+    try:
+        vacant_clients = workloads.vacant_clients[data["machine_type"]]
+    except:
+        vacant_clients = []
+    vacant_clients.append({"device_token":data["token"],"sid":data["sid"]})
+    workloads.vacant_clients[data["machine_type"]] = vacant_clients
+    print(workloads.vacant_clients)
+    return True
+
+# Request workload processing 
+@app.route('/requestWorkloadProcess', methods=['POST'])
+def requestWorkloadProcess():
+    
+    request_json = request.get_json()
+    user_id = request_json.get('user_id')
+    artefact_url = request_json.get('artefact_url')
+    spec = request_json.get('spec')
+
+    response_content = {}
+    workload_id = workloads.registerWorkload(user_id, artefact_url, spec)
+    if workload_id is not NULL:
+        jobqueue.placeWorkload(workload_id, artefact_url, spec, spec["machine_type"])
+        response_content = {
+            "message" : "success",
+            "machine_type" : workload_id
+        }
+    return jsonify(response_content)
 
 # Received when a new client is connected
 @socketio.on('registerClient')

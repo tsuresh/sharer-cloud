@@ -60,6 +60,26 @@ def deployArtefacts(url: str, container_name: str):
     else:
         print("Download failed: status code {}\n{}".format(r.status_code, r.text))
 
+def checkMachineVacantStatus(config: object, sid=None, deviceToken=None):
+    #Check if there's existing processes
+    if len(runtime.docker_env.getRunningWorkloads()) > 0:
+        print("There are existing processes running")
+        return {
+            'status' : False,
+            'message' : 'There are existing processes running',
+            'sid' : sid,
+            'token' : deviceToken,
+            'machine_type' : config.machine_type
+        }
+
+    return {
+        'status' : True,
+        'message' : 'Machine is vacant',
+        'sid' : sid,
+        'token' : deviceToken,
+        'machine_type' : config.machine_type
+    }
+
 def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, deviceToken=None):
 
     parsedSpec = parseSpec(spec)
@@ -72,7 +92,8 @@ def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, devi
             'message' : 'Incompatible image',
             'sid' : sid,
             'token' : deviceToken,
-            'workload_id' : workloadId
+            'workload_id' : workloadId,
+            'machine_type' : config.machine_type
         }
 
     #Check if there's existing processes
@@ -83,7 +104,8 @@ def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, devi
             'message' : 'There are existing processes running',
             'sid' : sid,
             'token' : deviceToken,
-            'workload_id' : workloadId
+            'workload_id' : workloadId,
+            'machine_type' : config.machine_type
         }
 
     #Check if the spec matches the hardware
@@ -95,7 +117,8 @@ def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, devi
                 'message' : 'Required CPU count is not sufficient',
                 'sid' : sid,
                 'token' : deviceToken,
-                'workload_id' : workloadId
+                'workload_id' : workloadId,
+                'machine_type' : config.machine_type
             }
 
     #Check for CPU percentage allocation
@@ -107,26 +130,28 @@ def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, devi
                 'message' : 'Required CPU percentage is not sufficient',
                 'sid' : sid,
                 'token' : deviceToken,
-                'workload_id' : workloadId
+                'workload_id' : workloadId,
+                'machine_type' : config.machine_type
             }
 
     #Check for special requests
-    if all(item in config.device_requests for item in parsedSpec["device_requests"]) is False:
-        print("Required special features are not available in device")
-        return {
-            'status' : False,
-            'message' : 'Required special features are not available in device',
-            'sid' : sid,
-            'token' : deviceToken,
-            'workload_id' : workloadId
-        }
+    # if all(item in config.device_requests for item in parsedSpec["device_requests"]) is False:
+    #     print("Required special features are not available in device")
+    #     return {
+    #         'status' : False,
+    #         'message' : 'Required special features are not available in device',
+    #         'sid' : sid,
+    #         'token' : deviceToken,
+    #         'workload_id' : workloadId
+    #     }
     
     return {
         'status' : True,
         'message' : 'Container is ready to be scheduled',
         'sid' : sid,
         'token' : deviceToken,
-        'workload_id' : workloadId
+        'workload_id' : workloadId,
+        'machine_type' : config.machine_type
     }
 
 def parseSpec(parsedSpec):

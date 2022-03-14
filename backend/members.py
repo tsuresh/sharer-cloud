@@ -4,12 +4,12 @@ from google.oauth2 import service_account
 import uuid
 import os
 
-#Firestore
+# Firestore
 env_path = './keys/sharer-cloud-dev-a3df1d0f3647.json'
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = env_path
 db = firestore.Client()
 
-#Handle cluster join request and issue a token back
+# Handle cluster join request and issue a token back
 def join_network(client_id: str, system_configs: object):
     if client_id is not None and client_id is not None:
         device_token = str(uuid.uuid4())
