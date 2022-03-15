@@ -1,4 +1,5 @@
 from ast import Str
+from asyncio.windows_events import NULL
 from queue import Empty
 import yaml
 import runtime.docker_env
@@ -20,15 +21,11 @@ def placeWorkloads(payloadId, payloadUrl, spec, config):
         "sharercloud-wl-" + payloadId,
         parsedSpec["image"],
         parsedSpec["envars"],
-        "apt-get install unzip && mkdir sc_wl_{payloadId} && cd sc_wl_{payloadId} && wget {payloadUrl} && unzip {payloadId}.zip && {startCommands}".format(payloadId=payloadId, payloadUrl=payloadUrl, startCommands=startCommands),
+        "apt-get install unzip && mkdir sc_wl_{payloadId} && cd sc_wl_{payloadId} && wget {payloadUrl} && unzip {fileName} && {startCommands}".format(payloadId=payloadId, payloadUrl=payloadUrl, startCommands=startCommands, fileName=os.path.basename(payloadUrl)),
         config
     )
 
-    if containerLogs != False:
-        print(containerLogs)
-    else:
-        return containerLogs
-
+    return containerLogs
 
 def deployArtefacts(url: str, container_name: str):
 
@@ -166,8 +163,8 @@ def parseSpec(parsedSpec):
     if parsedSpec["spec"]["cpu_percent"] is not None:
         spec["cpu_percent"] = parsedSpec["spec"]["cpu_percent"]
 
-    if parsedSpec["spec"]["device_requests"] is not []:
-        spec["device_requests"] = parsedSpec["spec"]["device_requests"]
+    # if parsedSpec["spec"]["device_requests"] is not []:
+    #     spec["device_requests"] = parsedSpec["spec"]["device_requests"]
 
     if parsedSpec["spec"]["resultType"] is not None:
         spec["resultType"] = parsedSpec["spec"]["resultType"] #rawOut, fileWrite, noOut

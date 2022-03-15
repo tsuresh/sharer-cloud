@@ -12,6 +12,7 @@ sio = socketio.Client()
 # Socket connection request handeler
 @sio.event
 def connect():
+    print(sio.sid)
     sio.emit('registerClient', {
         'sid': sio.sid,
         'device_token': device_token
@@ -53,7 +54,19 @@ def catch_spec_check(data):
 # Listen to workload placement requests
 @sio.on('placeWorkload')
 def place_workload(data):
-    print("Place workload for session")
+    placementStatus = workloads.placeWorkloads(
+        data['workload_id'],
+        data['artefact_url'],
+        data['spec'],
+        config.configs
+    )
+    sio.emit('placeWorkloadResp', {
+        'workload_id' : data['workload_id'],
+        'resultRaw' : placementStatus,
+        'device_token' : device_token
+    })
+    print(placementStatus)
+    print('Workload placed.')
 
 def init():
     sio.connect('ws://localhost:5000', wait_timeout = 10)

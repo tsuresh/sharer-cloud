@@ -1,16 +1,23 @@
 from asyncio.windows_events import NULL
 from pydoc import cli
+from tkinter.messagebox import NO
 from flask import Flask, request, jsonify, render_template
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, join_room
 import members
 import workloads
 import jobqueue
+import time
+import threading
+import requests
+import yaml
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 client_connections = []
+
+vacant_clients = {}
 
 # Handle cluster join request and issue a token back
 @app.route('/join', methods=['POST'])
@@ -48,8 +55,26 @@ def getClients(workload_id, spec):
 # Status update from a given machine type
 def getVacantClients(machine_type):
     try:
+        vacant_clients[machine_type] = {}
+    except:
+        print("vacant_clients list is already empty for " + str(machine_type))
+    
+    try:
         socketio.emit('vacantCheck', namespace='/'+str(machine_type))
         print("Vacant check request broadcasted over network")
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def placeWorkload(workload_id: str, artefact_url: str, spec: object, target_sid: str, machine_type: str):
+    try:
+        socketio.emit('placeWorkload', {
+            'workload_id': workload_id,
+            'artefact_url': artefact_url,
+            'spec': spec
+        })
+        print("Workload placement request has been sent to " + target_sid)
         return True
     except Exception as e:
         print(e)
@@ -58,13 +83,20 @@ def getVacantClients(machine_type):
 # Request received when a client machine responds its vacancy
 @socketio.on('vacantCheckResp')
 def vacantCheckResp(data):
+    global vacant_clients
     try:
-        vacant_clients = workloads.vacant_clients[data["machine_type"]]
+        vacant_clients_tmp = list(vacant_clients[data["machine_type"]])
     except:
-        vacant_clients = []
-    vacant_clients.append({"device_token":data["token"],"sid":data["sid"]})
-    workloads.vacant_clients[data["machine_type"]] = vacant_clients
-    print(workloads.vacant_clients)
+        vacant_clients_tmp = []
+    vacant_clients_tmp.append(
+        {
+            "device_token":data["token"],
+            "sid":data["sid"]
+        }
+    )
+    vacant_clients[data["machine_type"]] = vacant_clients_tmp
+    print("Vacant peers.....................")
+    print(vacant_clients)
     return True
 
 # Request workload processing 
@@ -74,15 +106,16 @@ def requestWorkloadProcess():
     request_json = request.get_json()
     user_id = request_json.get('user_id')
     artefact_url = request_json.get('artefact_url')
-    spec = request_json.get('spec')
+    spec_url = request_json.get('spec_url')
+    machine_type = request_json.get('machine_type')
 
     response_content = {}
-    workload_id = workloads.registerWorkload(user_id, artefact_url, spec)
+    workload_id = workloads.registerWorkload(user_id, artefact_url, spec_url)
     if workload_id is not NULL:
-        jobqueue.placeWorkload(workload_id, artefact_url, spec, spec["machine_type"])
+        jobqueue.placeWorkload(workload_id, artefact_url, spec_url, machine_type)
         response_content = {
             "message" : "success",
-            "machine_type" : workload_id
+            "workload_id" : workload_id
         }
     return jsonify(response_content)
 
@@ -103,6 +136,15 @@ def specCheckResp(data):
     workloads.workload_client_queue[data["workload_id"]] = temp_clients
     return True
 
+# Received when a workload response is received
+@socketio.on('placeWorkloadResp')
+def placeWorkloadResp(data):
+    workload_id = data['workload_id']
+    device_token = data['device_token']
+    resultRaw = data['resultRaw']
+    workloads.setResults(workload_id, device_token, resultRaw)
+    print("Results for {workload_id} has been inserted to database..".format(workload_id=workload_id))
+
 # Handle when a new client is connected
 @socketio.on('connect')
 def connectClient():
@@ -113,5 +155,51 @@ def connectClient():
 def disconnectClient():
     print("Disconnected")
 
+# Request for vacant clients 
+@app.route('/requestVacantClients', methods=['POST'])
+def requestVacantClientsReq():
+    response_content = {}
+    machine_types = ["L2-DS"]
+    for machine in machine_types:
+        getVacantClients(machine)
+    response_content = {
+        "message" : "success"
+    }
+    return jsonify(response_content)
+
+# Get active clients via HTTP req
+@app.route('/getVacantClients', methods=['POST'])
+def getVacantClientsReq():
+    request_json = request.get_json()
+    machine_type = request_json.get('machine_type')
+    if machine_type is not NULL or machine_type is not None:
+        try:
+            vacant_clients_tmp = list(vacant_clients[machine_type])
+        except:
+            vacant_clients_tmp = []
+    return jsonify(vacant_clients_tmp)
+
+# Place workload in the machine
+@app.route('/placeWorkload', methods=['POST'])
+def placeWorkloadReq():
+    request_json = request.get_json()
+    workload_id = request_json.get('workload_id')
+    artefact_url = request_json.get('artefact_url')
+    spec_url = request_json.get('spec_url')
+    target_sid = request_json.get('target_sid')
+    machine_type = request_json.get('machine_type')
+
+    # Download YAML and encode it to json; throw is there's any errors
+    specContent = requests.get(spec_url)
+    spec = yaml.full_load(specContent.text)
+
+    placeWorkloadStatus = placeWorkload(workload_id, artefact_url, spec, target_sid, machine_type)
+    response_content = {
+        "status" : placeWorkloadStatus,
+        "message" : "success"
+    }
+    return jsonify(response_content)
+
 if __name__ == '__main__':
+    # Initiate thread
     socketio.run(app)
