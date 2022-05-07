@@ -1,17 +1,14 @@
 .DS_Store
-node_modules
-/dist
-
-# local env files
-.env.local
-.env.*.local
-
-# Log files
+node_modules/
 npm-debug.log*
 yarn-debug.log*
+yarn.lock
 yarn-error.log*
-stylelintOutput.log*
-inspect.js
+/test/unit/coverage/
+/test/e2e/reports/
+selenium-debug.log
+node_modules
+release
 
 # Editor directories and files
 .idea
@@ -20,5 +17,7 @@ inspect.js
 *.ntvs*
 *.njsproj
 *.sln
-*.sw*
-*.orig
+
+dist/
+packages
+.aliossrc
