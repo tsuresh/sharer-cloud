@@ -1,106 +1,177 @@
-# React Material Admin — Material-UI Dashboard Template
+<p align="center">
+  <a href="https://vuestic.dev" target="_blank">
+    <img alt="Vuestic UI Logo" width="500" src="./public/img/vuestic-admin-logo.png">
+  </a>
+</p>
 
-Built with [React](https://facebook.github.io/react/), [Material-UI](https://material-ui.com), [React Router](https://reacttraining.com/react-router/).
-**No jQuery and Bootstrap!**
+<p align="center">
+  Free and beautiful Vue.js admin template with 44+ custom UI components.</br>
+  Developed by  <a href="https://epicmax.co">Epicmax</a>.
+  Designed by <a href="#">Vasili Savitski</a>
+<br>
+Based on <a href="https://github.com/epicmaxco/vuestic-ui">Vuestic UI</a> library.
+</p>
 
-**This version uses React 16.14.0, React Router v5, MaterialUI v4, built with React Hooks and React Context (No Redux)**
 
-[View Demo](https://flatlogic.com/templates/react-material-admin/demo) | [Download](https://github.com/flatlogic/react-material-admin/archive/master.zip) | [More templates](https://flatlogic.com/templates) | [Support forum](https://flatlogic.com/forum)
+<p align="center">
+  <a href="https://vuestic.epicmax.co/admin/dashboard?theme=light"> Light theme demo </a> | <a href="https://vuestic.epicmax.co/admin/dashboard?theme=semi-dark">Semi-dark theme demo </a> | <a href="https://vuestic.epicmax.co/admin/dashboard?theme=original">Original theme demo </a> | <a href="https://vuestic.dev"> Vuestic UI documentation </a>
+</p>
 
-[![image](https://user-images.githubusercontent.com/24964748/55800639-df780300-5adc-11e9-84b7-7c2437088516.png)](https://flatlogic.com/admin-dashboards/react-material-admin/demo)
+> Vuestic Admin is built with Vuestic UI. See our
+<a href="https://github.com/epicmaxco/vuestic-ui/issues">issues</a>,
+<a href="https://vuestic.dev/en/contribution/guide">contributing guide</a> and join discussions on our
+<a href="https://discord.gg/jTKTjj2weV">discord server</a> to help us improve Vuestic Admin & Vuestic UI experience.
 
-## Full Version
+<p align="center">
+  <a href="https://vuestic.epicmax.co" target="_blank">
+    <img src="./public/img/vuestic-admin-image.jpg" align="center" width="888px"/>
+  </a>
+</p>
 
-This is a limited version of [**Full React Material Admin**](https://flatlogic.com/templates/react-material-admin-full/demo) with more components, pages and theme support.
+<p align="center">
+  <a href="https://circleci.com/gh/epicmaxco/vuestic-admin">
+    <img src="https://img.shields.io/circleci/build/github/epicmaxco/vuestic-admin/master" alt="Circleci">
+  </a>
+</p>
 
-## Features
+### Documentation
 
-- React (**16.14.0**)
-- React Hooks
-- React Context
-- **No jQuery and Bootstrap!**
-- Mobile friendly layout (responsive)
-- Create-react-app under the hood
-- React Router v5
-- Material-UI v4
-- Modular Architecture
-- CSS-in-JS styles
-- Webpack build
-- Stylish, clean, responsive layout
-- Authentication
+Documentation, guides and tutorials are available
+on <a href="https://vuestic.dev">vuestic.dev</a>
 
-## Pages
+### Official Discord Server
 
-We have implemented some basic pages, so you can see our template in action.
+Ask questions at the official
+community [discord server](https://discord.gg/jTKTjj2weV)
 
-- Dashboard
-- Typography
-- Tables
-- Notifications
-- Charts
-- Icons
-- Maps
-- Login
-- Error
+### Installation
 
-## Quick Start
+First of all, make sure you have all prerequisites installed:
 
-#### 1. Get the latest version
+* [Node.js](https://nodejs.org/en/) ( >=14.*)
+* [npm](https://www.npmjs.com/get-npm) version 3+ (
+  or [yarn](https://yarnpkg.com/lang/en/docs/install) version 1.16+)
+  and [Git](https://git-scm.com).
 
-You can start by cloning the latest version of React Dashboard on your
-local machine by running:
+After checking the prerequisites, follow these simple steps to install and use
+Vuestic Admin:
 
-```shell
-$ git clone https://github.com/flatlogic/react-material-admin.git MyApp
-$ cd MyApp
+```
+# clone the repo
+$ git clone https://github.com/epicmaxco/vuestic-admin.git myproject
+
+# go into app's directory and install dependencies:
+$ cd myproject
+
 ```
 
-#### 2. Run `yarn install`
+Then, if you use npm:
 
-This will install both run-time project dependencies and developer tools listed
-in [package.json](package.json) file.
+```
+$ npm install
 
-#### 3. Run `yarn start`
+# serve with hot reload at localhost:8080 by default.
+$ npm run serve
 
-Runs the app in the development mode.
+# build for production
+$ npm run build
 
-Open http://localhost:3000 to view it in the browser. Whenever you modify any of the source files inside the `/src` folder,
-the module bundler ([Webpack](http://webpack.github.io/)) will recompile the
-app on the fly and refresh all the connected browsers.
+# build for production and view the bundle analyzer report.
+$ npm run build --report
+```
 
-#### 4. Run `yarn build`
+If you use yarn:
 
-Builds the app for production to the build folder.
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+$ yarn install
 
-The build is minified and the filenames include the hashes.
-Your app is ready to be deployed!
+# serve with hot reload at localhost:8080 by default.
+$ yarn serve
 
-## Support
+# build for production
+$ yarn build
 
-For any additional information please go to our [**support forum**](https://flatlogic.com/forum) and raise your questions or feedback provide there. We highly appreciate your participation!
+# build for production and view the bundle analyzer report.
+$ yarn build --report
+```
 
-## How can I support developers?
+### Features
 
-- Star our GitHub repo :star:
-- [Tweet about it](https://twitter.com/intent/tweet?text=Amazing%20dashboard%20built%20with%20NodeJS,%20React%20and%20Bootstrap!&url=https://github.com/flatlogic/react-material-template&via=flatlogic).
-- Create pull requests, submit bugs, suggest new features or documentation updates :wrench:
-- Follow [@flatlogic on Twitter](https://twitter.com/flatlogic).
-- Subscribe to Flatlogic newsletter at [flatlogic.com](https://flatlogic.com/)
-- Like our page on [Facebook](https://www.facebook.com/flatlogic/) :thumbsup:
+[Responsive layout](https://vuestic.epicmax.co/admin/dashboard) |
+[charts (Chart.js)](https://vuestic.epicmax.co/admin/statistics/charts) |
+[progress bars](https://vuestic.epicmax.co/admin/statistics/progress-bars) |
+[forms](https://vuestic.epicmax.co/admin/forms/form-elements) |
+[selects](https://vuestic.epicmax.co/admin/forms/form-elements) |
+[date pickers](https://vuestic.epicmax.co/admin/forms/form-elements) |
+[checkboxes and radios](https://vuestic.epicmax.co/admin/forms/form-elements)
+|
+[static tables and data tables](https://vuestic.epicmax.co/admin/tables/data)
+|
+[medium editor](https://vuestic.epicmax.co/admin/forms/medium-editor) |
+[smooth typography](https://vuestic.epicmax.co/admin/ui/typography) |
+[buttons](https://vuestic.epicmax.co/admin/ui/buttons) |
+[collapses](https://vuestic.epicmax.co/admin/ui/collapses) |
+[color pickers](https://vuestic.epicmax.co/admin/ui/color-pickers) |
+[timelines](https://vuestic.epicmax.co/admin/ui/timelines) |
+[toasts](https://vuestic.epicmax.co/admin/ui/notifications) |
+[tooltips](https://vuestic.epicmax.co/admin/ui/popovers) |
+[popovers](https://vuestic.epicmax.co/admin/ui/popovers) |
+[icons](https://vuestic.epicmax.co/admin/ui/icons/) |
+[spinners](https://vuestic.epicmax.co/admin/ui/spinners) |
+[modals](https://vuestic.epicmax.co/admin/ui/modals) |
+[file upload](https://vuestic.epicmax.co/admin/ui/file-upload) |
+[chips](https://vuestic.epicmax.co/admin/ui/chips) |
+[trees](https://vuestic.epicmax.co/admin/ui/tree-view) |
+[cards](https://vuestic.epicmax.co/admin/ui/cards) |
+[ratings](https://vuestic.epicmax.co/admin/ui/rating) |
+[sliders](https://vuestic.epicmax.co/admin/ui/sliders) |
+[chat](https://vuestic.epicmax.co/admin/ui/chatPage) |
+[maps (Google, Yandex, Leaflet, amMap)](https://vuestic.epicmax.co/admin/maps/google-maps)
+|
+[login/signup pages templates](https://vuestic.epicmax.co/auth/login) |
+[404 pages templates](https://vuestic.epicmax.co/admin/pages/404-pages) |
+[i18n](https://vuestic.epicmax.co/admin/dashboard)
 
-## More from Flatlogic
+### Browser Support
 
-- [React Native Starter](https://github.com/flatlogic/react-native-starter) - 🚀 A powerful react native starter template that bootstraps development of your mobile application
-- [Sing App](https://github.com/flatlogic/sing-app) - 💥 Free and open-source admin dashboard template built with Bootstrap 4
-- [Awesome Bootstrap Checkboxes & Radios](https://github.com/flatlogic/awesome-bootstrap-checkbox) - ✅ Pure css way to make inputs look prettier
-- [React Dashboard](https://github.com/flatlogic/react-dashboard) - 🔥 React Dashboard - isomorphic admin dashboard template with GraphQL
-- [Light Blue Dashboard](https://github.com/flatlogic/light-blue-dashboard) - 💦 Free and open-source admin dashboard template built with Bootstrap
+We design Vuestic Admin to support the latest modern web browsers.
 
-## Premium themes
+| <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" /><br>Edge | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" /><br>Firefox | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" /><br>Chrome | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" /><br>Safari | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_48x48.png" alt="Opera" width="24px" height="24px" /><br>Opera |
+| --- | --- | --- | --- | --- |
+| Edge | last 2 versions  | last 2 versions | last 2 versions | last 2 versions |
 
-Looking for premium themes and templates? Check out more [admin dashboard templates at flatlogic.com](https://flatlogic.com/admin-dashboards).
+### Contributing
 
-## License
+Thanks for all your wonderful PRs, issues and ideas.
+<a href="https://github.com/epicmaxco/vuestic-admin/graphs/contributors">
+<img src="https://opencollective.com/vuestic-admin/contributors.svg?width=890&button=false" />
+</a>
+<br>
+You’re always welcome to join: check out
+our <a href="https://vuestic.dev/en/contribution/guide">
+contribution guides</a>
+, [open issues](https://github.com/epicmaxco/vuestic-ui/issues)
+and [discord server](https://discord.gg/jTKTjj2weV)
 
-[MIT](https://github.com/flatlogic/react-material-dashboard/blob/master/LICENSE.txt).
+## Can I hire you guys?
+Yes! Say hi: [hello@epicmax.co](mailto:hello@epicmax.co) </br>
+We will be happy to work with you! Other [work we’ve done](https://epicmax.co)
+
+### Awards
+
+<a href="https://flatlogic.com/templates/vuestic-vue-free-admin" target="_blank">
+    <img src="https://i.imgur.com/ZeQPZ3Q.png" align="center" width="150px"/>
+</a>
+<p>
+  By <a href="https://flatlogic.com/templates/vuestic-vue-free-admin" target="_blank">@flatlogic</a> marketplace
+</p>
+
+### Follow us
+
+Stay up to date with the latest Vuestic news! Follow us
+on [Twitter](https://twitter.com/epicmaxco)
+or [Facebook](https://facebook.com/epicmaxco)
+
+### License
+
+[MIT](https://github.com/epicmaxco/vuestic-admin/blob/master/LICENSE) license.
