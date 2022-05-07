@@ -71,14 +71,11 @@
 </template>
 
 <script>
-import CountriesList from '../data/CountriesList'
-
 export default {
   name: 'form-elements',
   data () {
     return {
       isMale: true,
-      countriesList: CountriesList,
       chosenCountry: '',
       simple: '',
       withIcon: '',
