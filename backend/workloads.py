@@ -12,7 +12,18 @@ db = firestore.Client()
 workload_client_queue = {}
 workload_client_queue_timeouts = {}
 
-def registerWorkload(user_id: str, artefact_url: str, spec_url: str):
+def getWorkloads():
+    output = []
+    try:
+        collnameref = db.collection(u'workload_requests')
+        docs = collnameref.stream()
+        for doc in docs:
+            output.append(doc.to_dict())
+        return output
+    except:
+        return output
+
+def registerWorkload(user_id: str, workload_name: str, artefact_url: str, spec_url: str, machine_type: str, machine_image: str):
     #generate workload ID
     workload_id = str(uuid.uuid4())
 
@@ -21,9 +32,13 @@ def registerWorkload(user_id: str, artefact_url: str, spec_url: str):
         doc_ref = db.collection(u'workload_requests').document(workload_id)
         doc_ref.set({
             'workload_id' : workload_id,
+            'workload_name' : workload_name,
             'user_id' : user_id,
             'artefact_url' : artefact_url,
-            'spec_url' : spec_url
+            'spec_url' : spec_url,
+            'machine_type' : machine_type,
+            'machine_image' : machine_image,
+            'status' : 'pending'
         })
         return workload_id
     except Exception as e:

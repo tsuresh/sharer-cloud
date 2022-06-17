@@ -1,26 +1,41 @@
 from asyncio.windows_events import NULL
 from pydoc import cli
 from tkinter.messagebox import NO
+from unicodedata import category
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO, join_room
+from flask_cors import CORS, cross_origin
 import members
 import workloads
 import jobqueue
+import uploads
 import time
-import threading
 import requests
 import yaml
+import time
+import os
+import uuid
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+cors = CORS(app)
+
+app.config['SECRET_KEY'] = 'secret!'
+app.config['CORS_HEADERS'] = 'Content-Type'
+app.config['UPLOAD_FOLDER'] = "tmp/"
 
 client_connections = []
-
 vacant_clients = {}
+
+images = {
+    'DS' : "intel/intel-optimized-tensorflow",
+    'RD' : "gazebo"
+}
 
 # Handle cluster join request and issue a token back
 @app.route('/join', methods=['POST'])
+@cross_origin()
 def join_network():
     request_json = request.get_json()
     client_id = request_json.get('client_id')
@@ -91,7 +106,11 @@ def vacantCheckResp(data):
     vacant_clients_tmp.append(
         {
             "device_token":data["token"],
-            "sid":data["sid"]
+            "sid":data["sid"],
+            "machine_name":data["machine_name"],
+            "machine_type":data["machine_type"],
+            "connected_time":time.time(),
+            "status":data["status"]
         }
     )
     vacant_clients[data["machine_type"]] = vacant_clients_tmp
@@ -99,8 +118,41 @@ def vacantCheckResp(data):
     print(vacant_clients)
     return True
 
+# Get system image based on the passed values
+def getImage(machine_type: str):
+    global images
+    splitted = machine_type.split("-", 1)
+    category = splitted[1]
+    try:
+        return images[category]
+    except:
+        return "default"
+
+# Get all workloads
+@app.route('/getWorkloads', methods=['GET'])
+@cross_origin()
+def getWorkloads():
+    return jsonify(workloads.getWorkloads())
+
+# Get full network
+@app.route('/getNetwork', methods=['GET'])
+@cross_origin()
+def getNetwork():
+    networkList = []
+    for key, value in vacant_clients.items():
+        for mcnType in value:
+            networkList.append({
+                'id' : mcnType["sid"],
+                'name': mcnType["machine_name"],
+                'machineType': mcnType["machine_type"],
+                'uptime': "%.2f Sec" % (time.time() - mcnType["connected_time"]),
+                'status': mcnType["status"]
+            })
+    return jsonify(networkList)
+
 # Request workload processing 
 @app.route('/requestWorkloadProcess', methods=['POST'])
+@cross_origin()
 def requestWorkloadProcess():
     
     request_json = request.get_json()
@@ -108,9 +160,11 @@ def requestWorkloadProcess():
     artefact_url = request_json.get('artefact_url')
     spec_url = request_json.get('spec_url')
     machine_type = request_json.get('machine_type')
+    machine_image = getImage(machine_type)
+    workload_name = request_json.get('workload_name')
 
     response_content = {}
-    workload_id = workloads.registerWorkload(user_id, artefact_url, spec_url)
+    workload_id = workloads.registerWorkload(user_id, workload_name, artefact_url, spec_url, machine_type, machine_image)
     if workload_id is not NULL:
         jobqueue.placeWorkload(workload_id, artefact_url, spec_url, machine_type)
         response_content = {
@@ -157,6 +211,7 @@ def disconnectClient():
 
 # Request for vacant clients 
 @app.route('/requestVacantClients', methods=['POST'])
+@cross_origin()
 def requestVacantClientsReq():
     response_content = {}
     machine_types = ["L2-DS"]
@@ -169,6 +224,7 @@ def requestVacantClientsReq():
 
 # Get active clients via HTTP req
 @app.route('/getVacantClients', methods=['POST'])
+@cross_origin()
 def getVacantClientsReq():
     request_json = request.get_json()
     machine_type = request_json.get('machine_type')
@@ -181,6 +237,7 @@ def getVacantClientsReq():
 
 # Place workload in the machine
 @app.route('/placeWorkload', methods=['POST'])
+@cross_origin()
 def placeWorkloadReq():
     request_json = request.get_json()
     workload_id = request_json.get('workload_id')
@@ -199,6 +256,41 @@ def placeWorkloadReq():
         "message" : "success"
     }
     return jsonify(response_content)
+
+# Upload files
+@app.route('/upload',methods=["POST"])
+@cross_origin()
+def upload():
+    try:
+        if request.method == 'POST':
+            f = request.files['file']
+            file_type = request.form['type']
+
+            if file_type == "spec":
+                path = f"specs/{str(uuid.uuid4().hex)}-spec.yaml"
+            elif file_type == "output":
+                path = f"outputs/{str(uuid.uuid4().hex)}-output.zip"
+            else:
+                path = f"artefacts/{str(uuid.uuid4().hex)}-artefact.zip"
+
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
+            #Start Do Main Process Here
+            TMP_FILE_NAME = os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename))
+            BUCKET_NAME = 'sharer-cloud-dev.appspot.com'
+            result = uploads.upload_blob(BUCKET_NAME, TMP_FILE_NAME, path)
+            #End Do Main Process Here
+            response_content = {
+                "url" : f"https://storage.googleapis.com/sharer-cloud-dev.appspot.com/{str(result)}",
+                "message" : "success"
+            }
+            return jsonify(response_content)
+    except Exception as e:
+        response_content = {
+            "url" : NULL,
+            "message" : "error",
+            "detail" : str(e)
+        }
+        return jsonify(response_content)
 
 if __name__ == '__main__':
     # Initiate thread
