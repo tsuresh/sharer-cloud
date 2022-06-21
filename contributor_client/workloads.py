@@ -11,7 +11,9 @@ def placeWorkloads(payloadId, payloadUrl, spec, config):
 
     parsedSpec = parseSpec(spec)
 
-    startCommands = ' && '.join(parsedSpec["start_commands"]);
+    startCommands = ' && '.join(parsedSpec["start_commands"])
+
+    postCommands = 'zip -r output.zip . && curl -F "workload_id={workload_id}" -F "file=@output.zip" -F "contributor_id={contributor_id}" -F "status={status}" -F "time_consumed={time_consumed}" -F "type=output" http://host.docker.internal:5000/upload'.format(workload_id=payloadId, contributor_id=config.contributor_id, status="success", time_consumed="2m")
 
     #pull missing images
     runtime.docker_env.pullImages(config)
@@ -21,7 +23,7 @@ def placeWorkloads(payloadId, payloadUrl, spec, config):
         "sharercloud-wl-" + payloadId,
         parsedSpec["image"],
         parsedSpec["envars"],
-        "apt-get install unzip && mkdir sc_wl_{payloadId} && cd sc_wl_{payloadId} && wget {payloadUrl} && unzip {fileName} && {startCommands}".format(payloadId=payloadId, payloadUrl=payloadUrl, startCommands=startCommands, fileName=os.path.basename(payloadUrl)),
+        "apt-get update -y && apt-get install -y unzip zip curl && mkdir sc_wl_{payloadId} && cd sc_wl_{payloadId} && wget {payloadUrl} && unzip {fileName} && {startCommands} > console.out && {postCommands}".format(payloadId=payloadId, payloadUrl=payloadUrl, startCommands=startCommands, fileName=os.path.basename(payloadUrl), postCommands=postCommands),
         config
     )
 
@@ -66,7 +68,8 @@ def checkMachineVacantStatus(config: object, sid=None, deviceToken=None):
             'message' : 'There are existing processes running',
             'sid' : sid,
             'token' : deviceToken,
-            'machine_type' : config.machine_type
+            'machine_type' : config.machine_type,
+            'machine_name' : os.environ['COMPUTERNAME']
         }
 
     return {
@@ -74,7 +77,8 @@ def checkMachineVacantStatus(config: object, sid=None, deviceToken=None):
         'message' : 'Machine is vacant',
         'sid' : sid,
         'token' : deviceToken,
-        'machine_type' : config.machine_type
+        'machine_type' : config.machine_type,
+        'machine_name' : os.environ['COMPUTERNAME']
     }
 
 def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, deviceToken=None):

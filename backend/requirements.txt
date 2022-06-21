@@ -2,3 +2,5 @@ flask
 websockets
 pika
 PyYAML
+google-cloud
+google-cloud-storage

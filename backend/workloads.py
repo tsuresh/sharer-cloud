@@ -23,7 +23,7 @@ def getWorkloads():
     except:
         return output
 
-def registerWorkload(user_id: str, workload_name: str, artefact_url: str, spec_url: str, machine_type: str, machine_image: str):
+def registerWorkload(user_id: str, workload_name: str, artefact_url: str, spec_url: str, machine_type: str, machine_image: str, replicas: str):
     #generate workload ID
     workload_id = str(uuid.uuid4())
 
@@ -38,7 +38,8 @@ def registerWorkload(user_id: str, workload_name: str, artefact_url: str, spec_u
             'spec_url' : spec_url,
             'machine_type' : machine_type,
             'machine_image' : machine_image,
-            'status' : 'pending'
+            'status' : 'pending',
+            'replicas' : replicas,
         })
         return workload_id
     except Exception as e:
@@ -52,6 +53,35 @@ def setResults(workload_id: str, device_token: str, resultsRaw: str):
         doc_ref.update({
             'device_token' : device_token,
             'resultsRaw' : resultsRaw
+        })
+        return workload_id
+    except Exception as e:
+        print(e)
+        return NULL
+
+def setStatus(workload_id: str, status: str):
+    #Update status
+    doc_ref = db.collection(u'workload_requests').document(workload_id)
+    doc_ref.update({
+        'status' : status
+    })
+
+def setOutputs(workload_id: str, contributor_id: str, file_url: str, time_consumed: str, status: str):
+    #generate result ID
+    result_id = str(uuid.uuid4())
+
+    #update database entity
+    try:
+        setStatus(workload_id, 'Completed')
+        #Set output data
+        doc_ref = db.collection(u'workload_outputs').document(workload_id).collection(u'results').document(result_id)
+        doc_ref.set({
+            'result_id' : result_id,
+            'workload_id' : workload_id,
+            'contributor_id' : contributor_id,
+            'file_url' : file_url,
+            'time_consumed' : time_consumed,
+            'status' : status
         })
         return workload_id
     except Exception as e:

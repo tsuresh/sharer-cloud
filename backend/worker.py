@@ -8,6 +8,7 @@ import utils
 import json
 import ast
 from types import SimpleNamespace
+import workloads
 
 machine_type = "L2-DS"
 
@@ -40,7 +41,7 @@ def callback(ch, method, properties, body):
 
         chosen_client = clients[0]
 
-        print("Workload with ID {workload_id} is allocated to client with device token {device_token}".format(workload_id=configs.workload_id, device_token=configs.device_token))
+        print("Workload with ID {workload_id} is allocated to client with device token {device_token}".format(workload_id=configs.workload_id, device_token=chosen_client.device_token))
 
         reqBody = {
                 "workload_id" : configs.workload_id, 
@@ -51,13 +52,15 @@ def callback(ch, method, properties, body):
         }
 
         # Place workload on a peer
-        placementCall = utils.makeRestCall("placeWorkload",reqBody)
+        utils.makeRestCall("placeWorkload",reqBody)
+
+        # Update workload status
+        workloads.setStatus(configs.workload_id, "allocated")
 
         # Acknowledge the request
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     else:
-
         print("No clients are currently available.")
 
         # Reject and requeue request

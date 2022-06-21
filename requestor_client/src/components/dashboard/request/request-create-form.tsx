@@ -65,34 +65,61 @@ const outputTypeOptions = [
 
 export const RequestCreateForm: FC = (props) => {
   const router = useRouter();
-  const [files, setFiles] = useState<File[]>([]);
+
+  const [configFiles, setConfigFiles] = useState<File[]>([]);
+  const [artefactFiles, setArtefactFiles] = useState<File[]>([]);
+
+  const [configFileUrl, setConfigFileUrl] = useState("");
+  const [artefactFileUrl, setArtefactFileUrl] = useState("");
+
   const formik = useFormik({
     initialValues: {
-      barcode: '925487986526',
       description: '',
       images: [],
       name: '',
-      newPrice: 0,
-      oldPrice: 0,
-      sku: 'IYV-8745',
       submit: null,
       machineType: 'L1-DS',
       outputType: 'logs'
     },
     validationSchema: Yup.object({
-      barcode: Yup.string().max(255),
       description: Yup.string().max(5000),
       images: Yup.array(),
       name: Yup.string().max(255).required(),
-      newPrice: Yup.number().min(0).required(),
-      oldPrice: Yup.number().min(0),
-      sku: Yup.string().max(255)
+      machineType: Yup.string().required(),
+      outputType: Yup.string().required(),
     }),
     onSubmit: async (values, helpers): Promise<void> => {
       try {
-        // NOTE: Make API request
-        toast.success('Product created!');
-        router.push('/dashboard/products').catch(console.error);
+        if(configFileUrl == "" || artefactFileUrl == ""){
+          toast.error('Please make sure to upload the files before proceeding!');
+        } else {
+          var myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+
+          var raw = JSON.stringify({
+            "user_id": "123",
+            "workload_name": values.name,
+            "artefact_url": artefactFileUrl,
+            "spec_url": configFileUrl,
+            "machine_type": values.machineType,
+            "output_type": values.outputType
+          });
+
+          var requestOptions: any = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+          };
+
+          fetch("http://localhost:5000/requestWorkloadProcess", requestOptions)
+            .then(response => response.text())
+            .then(result => {
+              toast.success('Workload requested!')
+              router.push('/dashboard/requests').catch(console.error);
+            })
+            .catch(error => toast.error('An error has occured while requesting!'));
+        }
       } catch (err) {
         console.error(err);
         toast.error('Something went wrong!');
@@ -103,16 +130,78 @@ export const RequestCreateForm: FC = (props) => {
     }
   });
 
+  const uploadArtefactFile = () => {
+    if (artefactFiles.length) {
+      const formData = new FormData();
+      formData.append('file', artefactFiles[0]);
+      formData.append('type', 'artefact');
+      fetch(
+        'http://localhost:5000/upload',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      )
+        .then((response) => response.json())
+        .then((result) => {
+          console.log('Success:', result);
+          setArtefactFileUrl(result["url"]);
+          toast.success('File successfully uploaded');
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          toast.success('File failed uploading');
+        });
+    }
+  }
+
+  const uploadConfigFile = () => {
+    if(configFiles.length > 0){
+      const formData = new FormData();
+      formData.append('file', configFiles[0]);
+      formData.append('type', 'spec');
+      fetch(
+        'http://localhost:5000/upload',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      )
+        .then((response) => response.json())
+        .then((result) => {
+          console.log('Success:', result);
+          setConfigFileUrl(result["url"]);
+          toast.success('File successfully uploaded');
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          toast.success('File failed uploading');
+        });
+    }
+  }
+
   const handleDrop = (newFiles: File[]): void => {
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    setConfigFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
   const handleRemove = (file: File): void => {
-    setFiles((prevFiles) => prevFiles.filter((_file) => _file.path !== file.path));
+    setConfigFiles((prevFiles) => prevFiles.filter((_file) => _file.path !== file.path));
   };
 
   const handleRemoveAll = (): void => {
-    setFiles([]);
+    setConfigFiles([]);
+  };
+
+  const handleArtefactDrop = (newFiles: File[]): void => {
+    setArtefactFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+
+  const handleArtefactRemove = (file: File): void => {
+    setArtefactFiles((prevFiles) => prevFiles.filter((_file) => _file.path !== file.path));
+  };
+
+  const handleArtefactRemoveAll = (): void => {
+    setArtefactFiles([]);
   };
 
   return (
@@ -153,7 +242,7 @@ export const RequestCreateForm: FC = (props) => {
                 error={Boolean(formik.touched.name && formik.errors.name)}
                 fullWidth
                 helperText={formik.touched.name && formik.errors.name}
-                label="Product Name"
+                label="Workload Name"
                 name="name"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
@@ -260,10 +349,12 @@ export const RequestCreateForm: FC = (props) => {
             >
               <FileDropzone
                 accept=".yaml"
-                files={files}
+                files={configFiles}
                 onDrop={handleDrop}
                 onRemove={handleRemove}
                 onRemoveAll={handleRemoveAll}
+                onUpload={uploadConfigFile}
+                maxFiles={1}
               />
             </Grid>
           </Grid>
@@ -298,10 +389,12 @@ export const RequestCreateForm: FC = (props) => {
             >
               <FileDropzone
                 accept=".zip"
-                files={files}
-                onDrop={handleDrop}
-                onRemove={handleRemove}
-                onRemoveAll={handleRemoveAll}
+                files={artefactFiles}
+                onDrop={handleArtefactDrop}
+                onRemove={handleArtefactRemove}
+                onRemoveAll={handleArtefactRemoveAll}
+                onUpload={uploadArtefactFile}
+                maxFiles={1}
               />
             </Grid>
           </Grid>

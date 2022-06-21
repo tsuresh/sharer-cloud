@@ -51,7 +51,7 @@ const applyFilters = (
 ): Request[] => requests.filter((request) => {
   if (filters.query) {
     let queryMatched = false;
-    const properties: ('name' | 'machineType')[] = ['name', 'machineType'];
+    const properties: ('workload_name' | 'machine_type')[] = ['workload_name', 'machine_type'];
 
     properties.forEach((property) => {
       if ((request[property]).toLowerCase().includes(filters.query!.toLowerCase())) {

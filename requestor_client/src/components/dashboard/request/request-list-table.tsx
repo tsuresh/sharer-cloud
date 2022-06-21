@@ -59,7 +59,7 @@ export const RequestListTable: FC<RequestsListTableProps> = (props) => {
   const handleSelectAllrequests = (event: ChangeEvent<HTMLInputElement>): void => {
     setSelectedrequests(
       event.target.checked
-        ? requests.map((request) => request.id)
+        ? requests.map((request) => request.workload_id)
         : []
     );
   };
@@ -140,12 +140,12 @@ export const RequestListTable: FC<RequestsListTableProps> = (props) => {
           </TableHead>
           <TableBody>
             {requests.map((request) => {
-              const isrequestselected = selectedrequests.includes(request.id);
+              const isrequestselected = selectedrequests.includes(request.workload_id);
 
               return (
                 <TableRow
                   hover
-                  key={request.id}
+                  key={request.workload_id}
                   selected={isrequestselected}
                 >
                   <TableCell padding="checkbox">
@@ -153,7 +153,7 @@ export const RequestListTable: FC<RequestsListTableProps> = (props) => {
                       checked={isrequestselected}
                       onChange={(event) => handleSelectOneRequest(
                         event,
-                        request.id
+                        request.workload_id
                       )}
                       value={isrequestselected}
                     />
@@ -169,30 +169,30 @@ export const RequestListTable: FC<RequestsListTableProps> = (props) => {
 
                       <Box sx={{ ml: 1 }}>
                         <NextLink
-                          href={`/dashboard/requests/${request.id}`}
+                          href={`/dashboard/requests/${request.workload_id}`}
                           passHref
                         >
                           <Link
                             color="inherit"
                             variant="subtitle2"
                           >
-                            {request.id}
+                            {request.workload_id}
                           </Link>
                         </NextLink>
                         <Typography
                           color="textSecondary"
                           variant="body2"
                         >
-                          {request.name}
+                          {request.workload_name}
                         </Typography>
                       </Box>
                     </Box>
                   </TableCell>
                   <TableCell>
-                    {request.machineType}
+                    {request.machine_type}
                   </TableCell>
                   <TableCell>
-                    {request.image}
+                    {request.machine_image}
                   </TableCell>
                   <TableCell>
                     <Typography
@@ -204,7 +204,7 @@ export const RequestListTable: FC<RequestsListTableProps> = (props) => {
                   </TableCell>
                   <TableCell align="right">
                     <NextLink
-                      href={`/dashboard/requests/${request.id}`} 
+                      href={`/dashboard/requests/${request.workload_id}`} 
                       passHref
                     >
                       <IconButton component="a">

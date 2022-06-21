@@ -162,11 +162,14 @@ def requestWorkloadProcess():
     machine_type = request_json.get('machine_type')
     machine_image = getImage(machine_type)
     workload_name = request_json.get('workload_name')
+    replicas = request_json.get('replicas') or 1
 
     response_content = {}
-    workload_id = workloads.registerWorkload(user_id, workload_name, artefact_url, spec_url, machine_type, machine_image)
+    workload_id = workloads.registerWorkload(user_id, workload_name, artefact_url, spec_url, machine_type, machine_image, replicas)
     if workload_id is not NULL:
-        jobqueue.placeWorkload(workload_id, artefact_url, spec_url, machine_type)
+        # Place workloads based on the replica count
+        for x in int(replicas):
+            jobqueue.placeWorkload(workload_id, artefact_url, spec_url, machine_type)
         response_content = {
             "message" : "success",
             "workload_id" : workload_id
@@ -278,6 +281,15 @@ def upload():
             TMP_FILE_NAME = os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename))
             BUCKET_NAME = 'sharer-cloud-dev.appspot.com'
             result = uploads.upload_blob(BUCKET_NAME, TMP_FILE_NAME, path)
+
+            #Update database if its a output
+            if file_type == "output":
+                workload_id = request.form['workload_id']
+                contributor_id = request.form['contributor_id']
+                status = request.form['status']
+                time_consumed = request.form['time_consumed']
+                workloads.setOutputs(workload_id, contributor_id, f"https://storage.googleapis.com/sharer-cloud-dev.appspot.com/{str(result)}", time_consumed, status)
+
             #End Do Main Process Here
             response_content = {
                 "url" : f"https://storage.googleapis.com/sharer-cloud-dev.appspot.com/{str(result)}",
