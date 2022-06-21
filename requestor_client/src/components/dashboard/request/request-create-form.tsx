@@ -63,6 +63,13 @@ const outputTypeOptions = [
   },
 ];
 
+const replicaOptions  = Array.from(Array(10).keys()).map(value => {
+  return {
+    label: `${value} replicas`,
+    value: value,
+  };
+});
+
 export const RequestCreateForm: FC = (props) => {
   const router = useRouter();
 
@@ -79,7 +86,8 @@ export const RequestCreateForm: FC = (props) => {
       name: '',
       submit: null,
       machineType: 'L1-DS',
-      outputType: 'logs'
+      outputType: 'logs',
+      replicas: 1
     },
     validationSchema: Yup.object({
       description: Yup.string().max(5000),
@@ -87,6 +95,7 @@ export const RequestCreateForm: FC = (props) => {
       name: Yup.string().max(255).required(),
       machineType: Yup.string().required(),
       outputType: Yup.string().required(),
+      replicas: Yup.number().max(10).required(),
     }),
     onSubmit: async (values, helpers): Promise<void> => {
       try {
@@ -102,7 +111,8 @@ export const RequestCreateForm: FC = (props) => {
             "artefact_url": artefactFileUrl,
             "spec_url": configFileUrl,
             "machine_type": values.machineType,
-            "output_type": values.outputType
+            "output_type": values.outputType,
+            "replicas" : values.replicas
           });
 
           var requestOptions: any = {
@@ -308,6 +318,38 @@ export const RequestCreateForm: FC = (props) => {
                   </MenuItem>
                 ))}
               </TextField>
+
+              <Typography
+                color="textSecondary"
+                sx={{
+                  mb: 2,
+                  mt: 3
+                }}
+                variant="subtitle2"
+              >
+                Replica Count
+              </Typography>
+
+              <TextField
+                error={Boolean(formik.touched.replicas && formik.errors.replicas)}
+                fullWidth
+                label="Replicas"
+                name="replicas"
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                select
+                value={formik.values.replicas}
+              >
+                {replicaOptions.map((option) => (
+                  <MenuItem
+                    key={option.value}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+
 
               {Boolean(formik.touched.description && formik.errors.description) && (
                 <Box sx={{ mt: 2 }}>

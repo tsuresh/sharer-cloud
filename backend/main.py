@@ -162,19 +162,33 @@ def requestWorkloadProcess():
     machine_type = request_json.get('machine_type')
     machine_image = getImage(machine_type)
     workload_name = request_json.get('workload_name')
-    replicas = request_json.get('replicas') or 1
+    replicas = request_json.get('replicas') or "1"
 
     response_content = {}
     workload_id = workloads.registerWorkload(user_id, workload_name, artefact_url, spec_url, machine_type, machine_image, replicas)
     if workload_id is not NULL:
         # Place workloads based on the replica count
-        for x in int(replicas):
+        for x in range(int(replicas)):
             jobqueue.placeWorkload(workload_id, artefact_url, spec_url, machine_type)
         response_content = {
             "message" : "success",
             "workload_id" : workload_id
         }
     return jsonify(response_content)
+
+# Get workload detail
+@app.route('/getWorkloadDetail', methods=['GET'])
+@cross_origin()
+def getWorkloadDetail():
+    workload_id = request.args.get('id')
+    return jsonify(workloads.getWorkload(workload_id))
+
+# Request workload processing 
+@app.route('/getWorkloadResponses', methods=['GET'])
+@cross_origin()
+def getWorkloadResponses():
+    workload_id = request.args.get('id')
+    return jsonify(workloads.getWorkloadResponses(workload_id))
 
 # Received when a new client is connected
 @socketio.on('registerClient')
@@ -198,7 +212,7 @@ def specCheckResp(data):
 def placeWorkloadResp(data):
     workload_id = data['workload_id']
     device_token = data['device_token']
-    resultRaw = data['resultRaw']
+    resultRaw = ''
     workloads.setResults(workload_id, device_token, resultRaw)
     print("Results for {workload_id} has been inserted to database..".format(workload_id=workload_id))
 

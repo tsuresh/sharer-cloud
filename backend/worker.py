@@ -55,7 +55,7 @@ def callback(ch, method, properties, body):
         utils.makeRestCall("placeWorkload",reqBody)
 
         # Update workload status
-        workloads.setStatus(configs.workload_id, "allocated")
+        workloads.setStatus(configs.workload_id, "Allocated to: " + chosen_client.device_token)
 
         # Acknowledge the request
         ch.basic_ack(delivery_tag=method.delivery_tag)

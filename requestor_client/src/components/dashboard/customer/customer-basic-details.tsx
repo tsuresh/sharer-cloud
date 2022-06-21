@@ -6,20 +6,32 @@ import { PropertyList } from '../../property-list';
 import { PropertyListItem } from '../../property-list-item';
 
 interface CustomerBasicDetailsProps {
-  address1?: string;
-  address2?: string;
-  country?: string;
-  email: string;
-  isVerified: boolean;
-  phone?: string;
-  state?: string;
+  workload_name?: string;
+  user_id?: string;
+  artefact_url?: string;
+  spec_url?: string;
+  machine_type?: string;
+  machine_image?: string;
+  status?: string;
+  replicas?: string;
 }
 
+
 export const CustomerBasicDetails: FC<CustomerBasicDetailsProps> = (props) => {
-  const { address1, address2, country, email, isVerified, phone, state, ...other } = props;
+  const { workload_name, user_id, artefact_url, spec_url, machine_type, machine_image, status, replicas, ...other } = props;
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
   const align = mdUp ? 'horizontal' : 'vertical';
+
+  //Download artefact
+  const downloadArtefact = () => {
+    window.location.href = `${artefact_url}`; 
+  }
+  
+  //Download spec 
+  const downloadSpec = () => {
+    window.location.href = `${spec_url}`; 
+  }
 
   return (
     <Card {...other}>
@@ -29,38 +41,44 @@ export const CustomerBasicDetails: FC<CustomerBasicDetailsProps> = (props) => {
         <PropertyListItem
           align={align}
           divider
-          label="Email"
-          value={email}
+          label="Workload Name"
+          value={workload_name}
         />
         <PropertyListItem
           align={align}
           divider
-          label="Phone"
-          value={phone}
+          label="Artefact URL"
+          value={artefact_url}
         />
         <PropertyListItem
           align={align}
           divider
-          label="Country"
-          value={country}
+          label="Spec URL"
+          value={spec_url}
         />
         <PropertyListItem
           align={align}
           divider
-          label="State/Region"
-          value={state}
+          label="Machine Type"
+          value={machine_type}
         />
         <PropertyListItem
           align={align}
           divider
-          label="Address 1"
-          value={state}
+          label="Machine Image"
+          value={machine_image}
         />
         <PropertyListItem
           align={align}
           divider
-          label="Address 2"
-          value={address2}
+          label="Status"
+          value={status}
+        />
+        <PropertyListItem
+          align={align}
+          divider
+          label="Number of Replicas"
+          value={replicas}
         />
       </PropertyList>
       <CardActions
@@ -74,23 +92,31 @@ export const CustomerBasicDetails: FC<CustomerBasicDetailsProps> = (props) => {
         <Button
           sx={{ m: 1 }}
           variant="outlined"
+          onClick={downloadArtefact}
         >
-          Reset &amp; Send Password
+          Download Artefact
         </Button>
-        <Button sx={{ m: 1 }}>
-          Login as Customer
+       
+        <Button
+          sx={{ m: 1 }}
+          variant="outlined"
+          onClick={downloadSpec}
+        >
+          Download Spec
         </Button>
+
       </CardActions>
     </Card>
   );
 };
 
 CustomerBasicDetails.propTypes = {
-  address1: PropTypes.string,
-  address2: PropTypes.string,
-  country: PropTypes.string,
-  email: PropTypes.string.isRequired,
-  isVerified: PropTypes.bool.isRequired,
-  phone: PropTypes.string,
-  state: PropTypes.string
+  workload_name: PropTypes.string,
+  user_id: PropTypes.string,
+  artefact_url: PropTypes.string,
+  spec_url: PropTypes.string,
+  machine_type: PropTypes.string,
+  machine_image: PropTypes.string,
+  status: PropTypes.string,
+  replicas: PropTypes.string,
 };

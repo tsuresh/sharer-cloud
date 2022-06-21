@@ -72,7 +72,6 @@ def setOutputs(workload_id: str, contributor_id: str, file_url: str, time_consum
 
     #update database entity
     try:
-        setStatus(workload_id, 'Completed')
         #Set output data
         doc_ref = db.collection(u'workload_outputs').document(workload_id).collection(u'results').document(result_id)
         doc_ref.set({
@@ -83,7 +82,25 @@ def setOutputs(workload_id: str, contributor_id: str, file_url: str, time_consum
             'time_consumed' : time_consumed,
             'status' : status
         })
+        setStatus(workload_id, 'Completed')
         return workload_id
     except Exception as e:
         print(e)
         return NULL
+
+def getWorkload(workload_id):
+    try:
+        return db.collection(u'workload_requests').document(workload_id).get().to_dict()
+    except:
+        return {}
+
+def getWorkloadResponses(workload_id):
+    output = []
+    try:
+        collnameref = db.collection(u'workload_outputs').document(workload_id).collection(u'results')
+        docs = collnameref.stream()
+        for doc in docs:
+            output.append(doc.to_dict())
+        return output
+    except:
+        return output

@@ -176,14 +176,15 @@ export const RequestListTable: FC<RequestsListTableProps> = (props) => {
                             color="inherit"
                             variant="subtitle2"
                           >
-                            {request.workload_id}
+                             <strong>{request.workload_name}</strong>
+                            
                           </Link>
                         </NextLink>
                         <Typography
                           color="textSecondary"
                           variant="body2"
                         >
-                          {request.workload_name}
+                         ID: {request.workload_id}
                         </Typography>
                       </Box>
                     </Box>

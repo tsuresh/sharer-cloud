@@ -14,24 +14,27 @@ import {
   TablePagination,
   TableRow
 } from '@mui/material';
-import { customerApi } from '../../../__fake-api__/customer-api';
 import { useMounted } from '../../../hooks/use-mounted';
 import { ArrowRight as ArrowRightIcon } from '../../../icons/arrow-right';
 import type { CustomerInvoice } from '../../../types/customer';
 import { MoreMenu } from '../../more-menu';
 import { Scrollbar } from '../../scrollbar';
 import { SeverityPill } from '../../severity-pill';
+import { requestApi } from 'src/__fake-api__/request-api';
+import { RequestResponse } from 'src/types/request';
+import { ArrowDownward } from '@mui/icons-material';
 
 export const CustomerInvoices: FC = (props) => {
-  const isMounted = useMounted();
-  const [invoices, setInvoices] = useState<CustomerInvoice[]>([]);
 
-  const getInvoices = useCallback(async () => {
+  const isMounted = useMounted();
+  const [responses, setResponses] = useState<RequestResponse[]>([]);
+
+  const getResults = useCallback(async (workload_id: string) => {
     try {
-      const data = await customerApi.getCustomerInvoices();
+      const data = await requestApi.getResponses(workload_id);
 
       if (isMounted()) {
-        setInvoices(data);
+        setResponses(data);
       }
     } catch (err) {
       console.error(err);
@@ -39,14 +42,15 @@ export const CustomerInvoices: FC = (props) => {
   }, [isMounted]);
 
   useEffect(() => {
-    getInvoices();
-  }, [getInvoices]);
+    const path = window.location.pathname.split("/");
+    getResults(path[path.length-1]);
+  }, [getResults]);
 
   return (
     <Card {...props}>
       <CardHeader
         action={<MoreMenu />}
-        title="Recent Invoices"
+        title="Workload Results"
       />
       <Divider />
       <Scrollbar>
@@ -57,10 +61,10 @@ export const CustomerInvoices: FC = (props) => {
                 ID
               </TableCell>
               <TableCell>
-                Date
+                Artefact URL
               </TableCell>
               <TableCell>
-                Total
+                Duration
               </TableCell>
               <TableCell>
                 Status
@@ -71,30 +75,30 @@ export const CustomerInvoices: FC = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {invoices.map((invoice) => (
-              <TableRow key={invoice.id}>
+            {responses.map((response, index) => (
+              <TableRow key={response.result_id}>
                 <TableCell>
                   #
-                  {invoice.id}
+                  {index+1}
                 </TableCell>
                 <TableCell>
-                  {format(invoice.issueDate, 'MMM dd,yyyy')}
+                  {response.file_url}
                 </TableCell>
                 <TableCell>
-                  {invoice.amount}
+                  {response.time_consumed}
                 </TableCell>
                 <TableCell>
-                  <SeverityPill color={invoice.status === 'paid' ? 'success' : 'error'}>
-                    {invoice.status}
+                  <SeverityPill color={response.status === 'success' ? 'success' : 'error'}>
+                    {response.status}
                   </SeverityPill>
                 </TableCell>
                 <TableCell align="right">
                   <NextLink
-                    href="/dashboard/invoices/1"
+                    href={response.file_url}
                     passHref
                   >
                     <IconButton component="a">
-                      <ArrowRightIcon fontSize="small" />
+                      <ArrowDownward fontSize="small" />
                     </IconButton>
                   </NextLink>
                 </TableCell>
@@ -105,7 +109,7 @@ export const CustomerInvoices: FC = (props) => {
       </Scrollbar>
       <TablePagination
         component="div"
-        count={invoices.length}
+        count={responses.length}
         onPageChange={(): void => {
         }}
         onRowsPerPageChange={(): void => {

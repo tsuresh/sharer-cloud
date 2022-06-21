@@ -17,7 +17,6 @@ import {
   Typography
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { customerApi } from '../../../../__fake-api__/customer-api';
 import { AuthGuard } from '../../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../../components/dashboard/dashboard-layout';
 import { CustomerBasicDetails } from '../../../../components/dashboard/customer/customer-basic-details';
@@ -32,28 +31,34 @@ import { PencilAlt as PencilAltIcon } from '../../../../icons/pencil-alt';
 import { gtm } from '../../../../lib/gtm';
 import type { Customer } from '../../../../types/customer';
 import { getInitials } from '../../../../utils/get-initials';
+import { requestApi } from 'src/__fake-api__/request-api';
+import { Request } from 'src/types/request';
 
 const tabs = [
   { label: 'Details', value: 'details' },
-  { label: 'Invoices', value: 'invoices' },
-  { label: 'Logs', value: 'logs' }
+  { label: 'Results', value: 'results' },
+  { label: 'Console', value: 'console' }
 ];
 
 const CustomerDetails: NextPage = () => {
   const isMounted = useMounted();
-  const [customer, setCustomer] = useState<Customer | null>(null);
+
+  const [request, setRequest] = useState<Request | null>(null);
   const [currentTab, setCurrentTab] = useState<string>('details');
 
   useEffect(() => {
     gtm.push({ event: 'page_view' });
   }, []);
 
-  const getCustomer = useCallback(async () => {
+  const getWorkload = useCallback(async (workload_id: string) => {
     try {
-      const data = await customerApi.getCustomer();
+
+      console.log(workload_id);
+
+      const data = await requestApi.getRequest(workload_id)
 
       if (isMounted()) {
-        setCustomer(data);
+        setRequest(data);
       }
     } catch (err) {
       console.error(err);
@@ -62,17 +67,17 @@ const CustomerDetails: NextPage = () => {
 
   useEffect(
     () => {
-      getCustomer();
+      const path = window.location.pathname.split("/");
+      getWorkload(path[path.length-1]);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
+  
   const handleTabsChange = (event: ChangeEvent<{}>, value: string): void => {
     setCurrentTab(value);
   };
 
-  if (!customer) {
+  if (!request) {
     return null;
   }
 
@@ -80,7 +85,7 @@ const CustomerDetails: NextPage = () => {
     <>
       <Head>
         <title>
-          Dashboard: Customer Details | Material Kit Pro
+          Workload Detail
         </title>
       </Head>
       <Box
@@ -94,7 +99,7 @@ const CustomerDetails: NextPage = () => {
           <div>
             <Box sx={{ mb: 4 }}>
               <NextLink
-                href="/dashboard/customers"
+                href="/dashboard/requests"
                 passHref
               >
                 <Link
@@ -110,7 +115,7 @@ const CustomerDetails: NextPage = () => {
                     sx={{ mr: 1 }}
                   />
                   <Typography variant="subtitle2">
-                    Customers
+                    Workloads
                   </Typography>
                 </Link>
               </NextLink>
@@ -128,19 +133,9 @@ const CustomerDetails: NextPage = () => {
                   overflow: 'hidden'
                 }}
               >
-                <Avatar
-                  src={customer.avatar}
-                  sx={{
-                    height: 64,
-                    mr: 2,
-                    width: 64
-                  }}
-                >
-                  {getInitials(customer.name)}
-                </Avatar>
                 <div>
                   <Typography variant="h4">
-                    {customer.email}
+                    {request.workload_name}
                   </Typography>
                   <Box
                     sx={{
@@ -149,10 +144,10 @@ const CustomerDetails: NextPage = () => {
                     }}
                   >
                     <Typography variant="subtitle2">
-                      user_id:
+                      workload_id:
                     </Typography>
                     <Chip
-                      label={customer.id}
+                      label={request.workload_id}
                       size="small"
                       sx={{ ml: 1 }}
                     />
@@ -163,7 +158,7 @@ const CustomerDetails: NextPage = () => {
                 item
                 sx={{ m: -1 }}
               >
-                <NextLink
+                {/* <NextLink
                   href="/dashboard/customers/1/edit"
                   passHref
                 >
@@ -175,7 +170,7 @@ const CustomerDetails: NextPage = () => {
                   >
                     Edit
                   </Button>
-                </NextLink>
+                </NextLink> */}
                 <Button
                   endIcon={(<ChevronDownIcon fontSize="small" />)}
                   sx={{ m: 1 }}
@@ -215,37 +210,26 @@ const CustomerDetails: NextPage = () => {
                   xs={12}
                 >
                   <CustomerBasicDetails
-                    address1={customer.address1}
-                    address2={customer.address2}
-                    country={customer.country}
-                    email={customer.email}
-                    isVerified={!!customer.isVerified}
-                    phone={customer.phone}
-                    state={customer.state}
+                    workload_name={request.workload_name}
+                    user_id={request.user_id}
+                    artefact_url={request.artefact_url}
+                    spec_url={request.spec_url}
+                    machine_type={request.machine_type}
+                    machine_image={request.machine_image}
+                    status={request.status}
+                    replicas={request.replicas}
                   />
                 </Grid>
-                <Grid
-                  item
-                  xs={12}
-                >
-                  <CustomerPayment />
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                >
-                  <CustomerEmailsSummary />
-                </Grid>
-                <Grid
+                {/* <Grid
                   item
                   xs={12}
                 >
                   <CustomerDataManagement />
-                </Grid>
+                </Grid> */}
               </Grid>
             )}
-            {currentTab === 'invoices' && <CustomerInvoices />}
-            {currentTab === 'logs' && <CustomerLogs />}
+            {currentTab === 'results' && <CustomerInvoices />}
+            {currentTab === 'console' && <CustomerLogs />}
           </Box>
         </Container>
       </Box>
