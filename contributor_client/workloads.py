@@ -13,7 +13,7 @@ def placeWorkloads(payloadId, payloadUrl, spec, config):
 
     startCommands = ' && '.join(parsedSpec["start_commands"])
 
-    postCommands = 'zip -r output.zip . && curl -F "workload_id={workload_id}" -F "file=@output.zip" -F "contributor_id={contributor_id}" -F "status={status}" -F "time_consumed={time_consumed}" -F "type=output" http://host.docker.internal:5000/upload'.format(workload_id=payloadId, contributor_id=config.contributor_id, status="success", time_consumed="2m")
+    postCommands = 'zip -r output.zip . && curl -F "workload_id={workload_id}" -F "file=@output.zip" -F "contributor_id={contributor_id}" -F "status={status}" -F "time_consumed={time_consumed}" -F "type=output" http://host.docker.internal:5000/upload'.format(workload_id=payloadId, contributor_id=config.contributor_id, status="success", time_consumed="1")
 
     #pull missing images
     runtime.docker_env.pullImages(config)
@@ -69,6 +69,7 @@ def checkMachineVacantStatus(config: object, sid=None, deviceToken=None):
             'sid' : sid,
             'token' : deviceToken,
             'machine_type' : config.machine_type,
+            'contributor_id' : config.contributor_id,
             'machine_name' : os.environ['COMPUTERNAME']
         }
 
@@ -78,6 +79,7 @@ def checkMachineVacantStatus(config: object, sid=None, deviceToken=None):
         'sid' : sid,
         'token' : deviceToken,
         'machine_type' : config.machine_type,
+        'contributor_id' : config.contributor_id,
         'machine_name' : os.environ['COMPUTERNAME']
     }
 

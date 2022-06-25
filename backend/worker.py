@@ -9,6 +9,7 @@ import json
 import ast
 from types import SimpleNamespace
 import workloads
+import contribLogging
 
 machine_type = "L2-DS"
 
@@ -41,21 +42,25 @@ def callback(ch, method, properties, body):
 
         chosen_client = clients[0]
 
-        print("Workload with ID {workload_id} is allocated to client with device token {device_token}".format(workload_id=configs.workload_id, device_token=chosen_client.device_token))
+        print("Workload with ID {workload_id} is allocated to client with contributor ID {device_token}".format(workload_id=configs.workload_id, device_token=chosen_client.contributor_id))
 
         reqBody = {
                 "workload_id" : configs.workload_id, 
                 "artefact_url" : configs.artefact_url,
                 "spec_url" : configs.spec_url,
                 "target_sid" : chosen_client.sid,
-                "machine_type" : machine_type
+                "machine_type" : machine_type,
+                "contributor_id" : chosen_client.contributor_id
         }
 
         # Place workload on a peer
         utils.makeRestCall("placeWorkload",reqBody)
 
         # Update workload status
-        workloads.setStatus(configs.workload_id, "Allocated to: " + chosen_client.device_token)
+        workloads.setStatus(configs.workload_id, "Allocated to: " + chosen_client.contributor_id)
+
+        # Set contribution logging 
+        contribLogging.assign_task(chosen_client.contributor_id)
 
         # Acknowledge the request
         ch.basic_ack(delivery_tag=method.delivery_tag)

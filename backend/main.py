@@ -33,27 +33,6 @@ images = {
     'RD' : "gazebo"
 }
 
-# Handle cluster join request and issue a token back
-@app.route('/join', methods=['POST'])
-@cross_origin()
-def join_network():
-    request_json = request.get_json()
-    client_id = request_json.get('client_id')
-    system_configs = request_json.get('system_configs')
-    response_content = None
-    device_token = members.join_network(client_id, system_configs)
-    if device_token is not NULL:
-        response_content = {
-            "message" : "success",
-            "device_token" : device_token
-        }
-    else:
-        response_content = {
-            "message" : "error",
-            "device_token" : device_token
-        }
-    return jsonify(response_content)
-
 # Broadcast status check request over the network
 def getClients(workload_id, spec):
     try:
@@ -103,6 +82,9 @@ def vacantCheckResp(data):
         vacant_clients_tmp = list(vacant_clients[data["machine_type"]])
     except:
         vacant_clients_tmp = []
+
+    predictedScores = members.get_predicted_scores(data["contributor_id"])
+
     vacant_clients_tmp.append(
         {
             "device_token":data["token"],
@@ -110,12 +92,19 @@ def vacantCheckResp(data):
             "machine_name":data["machine_name"],
             "machine_type":data["machine_type"],
             "connected_time":time.time(),
+            "contributor_id":data["contributor_id"],
+            "predicted_contributor_score" : predictedScores["predicted_contributor_score"],
+            "predicted_contribution_hours" : predictedScores["predicted_contribution_hours"],
             "status":data["status"]
         }
     )
     vacant_clients[data["machine_type"]] = vacant_clients_tmp
     print("Vacant peers.....................")
     print(vacant_clients)
+
+    # Sort contributor array
+    vacant_clients.sort(key=lambda x: x.predicted_contributor_score, reverse=True)
+
     return True
 
 # Get system image based on the passed values
@@ -193,6 +182,7 @@ def getWorkloadResponses():
 # Received when a new client is connected
 @socketio.on('registerClient')
 def registerClient(data):
+    members.join_network(data['contributor_id'], data['device_token'], data['sid'])
     client_connections.append(data)
     print(data)
 
@@ -212,8 +202,9 @@ def specCheckResp(data):
 def placeWorkloadResp(data):
     workload_id = data['workload_id']
     device_token = data['device_token']
+    contributor_id = data['contributor_id']
     resultRaw = ''
-    workloads.setResults(workload_id, device_token, resultRaw)
+    workloads.setResults(workload_id, device_token, contributor_id, resultRaw)
     print("Results for {workload_id} has been inserted to database..".format(workload_id=workload_id))
 
 # Handle when a new client is connected

@@ -15,13 +15,14 @@ def connect():
     print(sio.sid)
     sio.emit('registerClient', {
         'sid': sio.sid,
-        'device_token': device_token
+        'device_token': device_token,
+        'contributor_id' : config.configs.contributor_id
     })
     print("Socket connection successful")
 
 # Socket connections error handeler
 @sio.event
-def connect_error():
+def connect_error(error):
     print("Socket connection failed")
 
 # Socket disconnected error handeler
@@ -63,7 +64,8 @@ def place_workload(data):
     sio.emit('placeWorkloadResp', {
         'workload_id' : data['workload_id'],
         'resultRaw' : placementStatus,
-        'device_token' : device_token
+        'device_token' : device_token,
+        'contributor_id' : config.configs.contributor_id
     })
     print(placementStatus)
     print('Workload placed.')

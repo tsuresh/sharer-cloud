@@ -1,8 +1,11 @@
 from asyncio.windows_events import NULL
 from google.cloud import firestore
+from google.cloud import bigquery
 from google.oauth2 import service_account
 import uuid
 import os
+from datetime import datetime
+import contribLogging
 
 #Firestore
 env_path = './keys/sharer-cloud-dev-a3df1d0f3647.json'
@@ -46,7 +49,7 @@ def registerWorkload(user_id: str, workload_name: str, artefact_url: str, spec_u
         print(e)
         return NULL
 
-def setResults(workload_id: str, device_token: str, resultsRaw: str):
+def setResults(workload_id: str, device_token: str, contributor_id: str, resultsRaw: str):
     #update database entity
     try:
         doc_ref = db.collection(u'workload_requests').document(workload_id)
@@ -70,6 +73,10 @@ def setOutputs(workload_id: str, contributor_id: str, file_url: str, time_consum
     #generate result ID
     result_id = str(uuid.uuid4())
 
+     # Update dataset 
+    contribLogging.complete_task(contributor_id)
+    contribLogging.add_contribution_hours(contributor_id, int(time_consumed))
+
     #update database entity
     try:
         #Set output data
@@ -83,6 +90,7 @@ def setOutputs(workload_id: str, contributor_id: str, file_url: str, time_consum
             'status' : status
         })
         setStatus(workload_id, 'Completed')
+
         return workload_id
     except Exception as e:
         print(e)
