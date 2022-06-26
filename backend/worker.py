@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-from asyncio.windows_events import NULL
-from distutils.command.config import config
-from pydoc import cli
 import pika
 import time
 import utils
@@ -33,7 +30,7 @@ def callback(ch, method, properties, body):
 
     # Get all vacant clients
     clients = utils.makeRestCall("getVacantClients",{"machine_type" : machine_type})
-    chosen_client = NULL
+    chosen_client = None
 
     # Allocate task to one vacant client 
     if len(clients) > 0:

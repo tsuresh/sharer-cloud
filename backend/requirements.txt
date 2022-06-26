@@ -5,7 +5,6 @@ PyYAML
 google-cloud
 google-cloud-storage
 google-cloud-bigquery
-pandas
-fbprophet
-scikit-learn
-matplotlib
+google-cloud-firestore
+Flask-SocketIO
+Flask-Cors

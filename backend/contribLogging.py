@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from google.cloud import firestore
 from google.cloud import bigquery
 from google.oauth2 import service_account
@@ -41,7 +40,7 @@ def assign_task(contributor_id: str):
         return "complete"
     except Exception as e:
         print(e)
-        return NULL
+        return None
 
 # Update completed tasks count of dataset 
 def complete_task(contributor_id: str):
@@ -66,7 +65,7 @@ def complete_task(contributor_id: str):
         return "complete"
     except Exception as e:
         print(e)
-        return NULL
+        return None
 
 # Add contribution hours count on dataset
 def add_contribution_hours(contributor_id: str, hours: str):
@@ -91,7 +90,7 @@ def add_contribution_hours(contributor_id: str, hours: str):
         return "complete"
     except Exception as e:
         print(e)
-        return NULL
+        return None
 
 # Add data to BigQuery
 def add_to_bq(rows_to_insert):
@@ -146,11 +145,3 @@ def update_all_predictions():
         members.update_contribution_hours(str(row.contributor_id), str(row.forecast_value))
 
     print("Added predicted data to database")
-
-# Update dataset 
-update_daily_stats()
-
-# Conduct model updating
-
-# Update all data in database
-update_all_predictions()

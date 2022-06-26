@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from google.cloud import firestore
 from google.oauth2 import service_account
 import uuid
@@ -32,7 +31,7 @@ def join_network(contributor_id: str, device_token: str, sid: str):
         return device_token
     except Exception as e:
         print(e)
-        return NULL
+        return None
 
 # Update contribution score on datastore
 def update_prediction_score(contributor_id: str, predicted_contributor_score: str):

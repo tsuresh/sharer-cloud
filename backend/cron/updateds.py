@@ -1,8 +1,6 @@
-from asyncio.windows_events import NULL
 from google.cloud import firestore
 from google.cloud import bigquery
 from google.oauth2 import service_account
-import uuid
 import os
 from datetime import datetime
 
@@ -26,6 +24,3 @@ def workloadAssignment(contributor_id: str, reliability_score: str, contribution
         print("New rows have been added.")
     else:
         print("Encountered errors while inserting rows: {}".format(errors))
-
-#def getDailyScores():
-    

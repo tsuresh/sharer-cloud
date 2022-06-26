@@ -1,9 +1,5 @@
-from asyncio.windows_events import NULL
-from pydoc import cli
-from tkinter.messagebox import NO
-from unicodedata import category
-from flask import Flask, request, jsonify, render_template
-from flask_socketio import SocketIO, join_room
+from flask import Flask, request, jsonify
+from flask_socketio import SocketIO
 from flask_cors import CORS, cross_origin
 import members
 import workloads
@@ -155,7 +151,7 @@ def requestWorkloadProcess():
 
     response_content = {}
     workload_id = workloads.registerWorkload(user_id, workload_name, artefact_url, spec_url, machine_type, machine_image, replicas)
-    if workload_id is not NULL:
+    if workload_id is not None:
         # Place workloads based on the replica count
         for x in range(int(replicas)):
             jobqueue.placeWorkload(workload_id, artefact_url, spec_url, machine_type)
@@ -236,7 +232,7 @@ def requestVacantClientsReq():
 def getVacantClientsReq():
     request_json = request.get_json()
     machine_type = request_json.get('machine_type')
-    if machine_type is not NULL or machine_type is not None:
+    if machine_type is not None or machine_type is not None:
         try:
             vacant_clients_tmp = list(vacant_clients[machine_type])
         except:
@@ -303,7 +299,7 @@ def upload():
             return jsonify(response_content)
     except Exception as e:
         response_content = {
-            "url" : NULL,
+            "url" : None,
             "message" : "error",
             "detail" : str(e)
         }
