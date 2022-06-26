@@ -1,19 +1,4 @@
-import platform,socket,re,uuid,psutil,logging,cpuinfo,GPUtil,api,speedtest
-
-def updateSystemStatus(token):
-    api.updateSystemSpecs(getSystemInfo(), token)
-
-def updateNetworkStatus(token):
-    api.updateSystemSpecs(getNetworkSpeed(), token)
-
-def updateCpuUsage(token):
-    api.updateSystemSpecs(getProcessorInfo(), token)
-
-def updateGpuUsage(token):
-    api.updateSystemSpecs(getGPUInfo(), token)
-
-def updateContainerInfo(token):
-    print("Update container status")
+import platform,socket,re,uuid,cpuinfo,GPUtil,speedtest
 
 # Get processor info
 def getProcessorInfo():
@@ -55,10 +40,9 @@ def getSystemInfo():
         info['hostname']=socket.gethostname()
         info['ip-address']=socket.gethostbyname(socket.gethostname())
         info['mac-address']=':'.join(re.findall('..', '%012x' % uuid.getnode()))
-        info['ram']=str(round(psutil.virtual_memory().total / (1024.0 **3)))+" GB"
         return {'system' : info}
     except Exception as e:
-        logging.exception(e)
+        print(e)
     
 # Get network speed
 def getNetworkSpeed():
@@ -67,10 +51,3 @@ def getNetworkSpeed():
     info['download-speed']=network.upload()
     info['upload-speed']=network.download()
     return {'network', info}
-
-def updateAll(token):
-    updateSystemStatus(token)
-    updateCpuUsage(token)
-    updateGpuUsage(token)
-
-updateAll('12346546546')

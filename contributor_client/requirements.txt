@@ -1,10 +1,8 @@
-platform
-socket
-re
+lib-platform
+python-socketio
+regex
 uuid
-json
-psutil
-logging
 py-cpuinfo
 GPUtil
 pyyaml
+docker

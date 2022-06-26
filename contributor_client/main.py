@@ -1,7 +1,7 @@
 import socketio
 import config
 import workloads
-import json
+#import json
 from types import SimpleNamespace
 
 device_token = "123456"
