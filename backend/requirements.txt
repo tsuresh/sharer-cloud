@@ -8,3 +8,5 @@ google-cloud-bigquery
 google-cloud-firestore
 Flask-SocketIO
 Flask-Cors
+gunicorn
+eventlet

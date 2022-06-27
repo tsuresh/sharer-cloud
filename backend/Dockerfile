@@ -1,5 +1,5 @@
 #FROM rabbitmq:management-alpine
-FROM ubuntu
+FROM python:3
 
 # Set work directory
 WORKDIR /
@@ -15,7 +15,12 @@ RUN apt -y install curl
 RUN curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.deb.sh | bash
 RUN apt update
 RUN apt -y install rabbitmq-server
-RUN service rabbitmq-server start
+
+# Install PM2 process manager
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN apt -y install nodejs
+RUN apt -y install npm
+RUN npm install pm2 -g
 
 # Copy all files
 COPY . .
@@ -26,5 +31,10 @@ RUN pip3 install -r requirements.txt
 # Expose port
 EXPOSE 5000
 
+# Set env
+ENV FLASK_DEBUG=1
+ENV FLASK_ENV=development
+ENV FLASK_APP=main.py
+
 # Set python entrypoint
-ENTRYPOINT [ "python3", "-m" , "main", "run", "--host=0.0.0.0"]
+ENTRYPOINT ["/bin/bash", "/start.sh"]
