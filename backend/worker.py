@@ -23,9 +23,7 @@ def callback(ch, method, properties, body):
     configs = json.loads(json.dumps(ast.literal_eval(body.decode())), object_hook=lambda d: SimpleNamespace(**d))
 
     print("Workload with ID {workload_id} is ready to be allocated...".format(workload_id=configs.workload_id))
-
-    # Get vacant clients: @TODO to be removed along with automation process
-    utils.makeRestCall("requestVacantClients",{})
+    
     time.sleep(6)
 
     # Get all vacant clients
@@ -35,8 +33,7 @@ def callback(ch, method, properties, body):
     # Allocate task to one vacant client 
     if len(clients) > 0:
 
-        # Clients list should be sorted in prior @TODO: develop round robin algorithm
-
+        # Get the first item from clients list: already sorted
         chosen_client = clients[0]
 
         print("Workload with ID {workload_id} is allocated to client with contributor ID {device_token}".format(workload_id=configs.workload_id, device_token=chosen_client.contributor_id))

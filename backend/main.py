@@ -51,7 +51,7 @@ def getVacantClients(machine_type):
     
     try:
         socketio.emit('vacantCheck', namespace='/'+str(machine_type))
-        print("Vacant check request broadcasted over network")
+        print("Vacant check request broadcasted over network: " + machine_type)
         return True
     except Exception as e:
         print(e)
@@ -213,12 +213,12 @@ def connectClient():
 def disconnectClient():
     print("Disconnected")
 
-# Request for vacant clients 
+# Request for vacant clients: Broadcasr request over network
 @app.route('/requestVacantClients', methods=['POST'])
 @cross_origin()
 def requestVacantClientsReq():
     response_content = {}
-    machine_types = ["L2-DS"]
+    machine_types = ["L1-DS", "L2-DS", "L3-DS", "L1-RD", "L2-RD", "L3-RD"]
     for machine in machine_types:
         getVacantClients(machine)
     response_content = {
@@ -226,7 +226,7 @@ def requestVacantClientsReq():
     }
     return jsonify(response_content)
 
-# Get active clients via HTTP req
+# Get active clients via HTTP req: List Output
 @app.route('/getVacantClients', methods=['POST'])
 @cross_origin()
 def getVacantClientsReq():
@@ -239,7 +239,7 @@ def getVacantClientsReq():
             vacant_clients_tmp = []
     return jsonify(vacant_clients_tmp)
 
-# Place workload in the machine
+# Place workload in the machine: Send request to machine
 @app.route('/placeWorkload', methods=['POST'])
 @cross_origin()
 def placeWorkloadReq():

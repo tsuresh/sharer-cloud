@@ -1,6 +1,5 @@
 from google.cloud import firestore
 from google.oauth2 import service_account
-import uuid
 import os
 import math
 
