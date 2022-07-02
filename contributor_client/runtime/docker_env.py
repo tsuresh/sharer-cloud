@@ -20,15 +20,12 @@ def pullImages(configs: object):
 
 # Create the container under the given system boundaries
 def create(name: str, image: str, envars: list, deployCmd: str, configs: object):
-
     envars.append({
         'RUNQ_MEM' : configs.mem_limit
     })
-
     envars.append({
         'RUNQ_CPU' : configs.cpu_count
     })
-
     print("Container creating...")
     try:
         container = client.containers.run(

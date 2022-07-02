@@ -1,10 +1,10 @@
 import socketio
 import config
 import workloads
-#import json
+import uuid
 from types import SimpleNamespace
 
-device_token = "123456"
+device_token = uuid.uuid4()
 
 # standard Python
 sio = socketio.Client()

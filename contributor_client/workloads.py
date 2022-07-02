@@ -1,6 +1,3 @@
-#from ast import Str
-#from asyncio.windows_events import NULL
-#from queue import Empty
 import yaml
 import runtime.docker_env
 import requests
@@ -136,17 +133,6 @@ def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, devi
                 'workload_id' : workloadId,
                 'machine_type' : config.machine_type
             }
-
-    #Check for special requests
-    # if all(item in config.device_requests for item in parsedSpec["device_requests"]) is False:
-    #     print("Required special features are not available in device")
-    #     return {
-    #         'status' : False,
-    #         'message' : 'Required special features are not available in device',
-    #         'sid' : sid,
-    #         'token' : deviceToken,
-    #         'workload_id' : workloadId
-    #     }
     
     return {
         'status' : True,
