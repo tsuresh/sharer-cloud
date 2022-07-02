@@ -136,11 +136,11 @@ def update_daily_stats():
 def update_all_predictions():
     client = bigquery.Client()
 
-    get_reliability_scores_query = client.query('SELECT contributor_id, forecast_value FROM ML.FORECAST(MODEL `sharer-cloud-dev.sharer_cloud_data.reliability_score`, STRUCT(30 AS horizon, 0.90 AS confidence_level)) WHERE forecast_timestamp = \'2022-06-25\''.format(today=todayDate))
+    get_reliability_scores_query = client.query('SELECT contributor_id, forecast_value FROM ML.FORECAST(MODEL `sharer-cloud-dev.sharer_cloud_data.reliability_score`, STRUCT(30 AS horizon, 0.90 AS confidence_level)) WHERE forecast_timestamp = \'{today}\''.format(today=todayDate))
     for row in get_reliability_scores_query.result():
         members.update_prediction_score(str(row.contributor_id), str(row.forecast_value))
 
-    get_contribution_hours_query = client.query('SELECT contributor_id, forecast_value FROM ML.FORECAST(MODEL `sharer-cloud-dev.sharer_cloud_data.contribution_hours`, STRUCT(30 AS horizon, 0.90 AS confidence_level)) WHERE forecast_timestamp = \'2022-06-25\''.format(today=todayDate))
+    get_contribution_hours_query = client.query('SELECT contributor_id, forecast_value FROM ML.FORECAST(MODEL `sharer-cloud-dev.sharer_cloud_data.contribution_hours`, STRUCT(30 AS horizon, 0.90 AS confidence_level)) WHERE forecast_timestamp = \'{today}\''.format(today=todayDate))
     for row in get_contribution_hours_query.result():
         members.update_contribution_hours(str(row.contributor_id), str(row.forecast_value))
 
