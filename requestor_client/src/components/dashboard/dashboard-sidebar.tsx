@@ -439,7 +439,7 @@ export const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
               {t('Check our docs')}
             </Typography>
             <NextLink
-              href="/docs/welcome"
+              href="https://sharer-cloud-docs.readthedocs.io/"
               passHref
             >
               <Button

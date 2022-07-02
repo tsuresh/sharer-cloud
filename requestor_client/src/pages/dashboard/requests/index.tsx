@@ -26,6 +26,7 @@ import { Search as SearchIcon } from '../../../icons/search';
 import { Upload as UploadIcon } from '../../../icons/upload';
 import { gtm } from '../../../lib/gtm';
 import type { Request } from '../../../types/request';
+import NextLink from 'next/link';
 
 interface Filters {
   query?: string;
@@ -155,12 +156,18 @@ const RequestList: NextPage = () => {
                 </Typography>
               </Grid>
               <Grid item>
-                <Button
-                  startIcon={<PlusIcon fontSize="small" />}
-                  variant="contained"
+
+                <NextLink
+                  href="/dashboard/requests/new"
+                  passHref
                 >
-                  New Request
-                </Button>
+                  <Button
+                    startIcon={<PlusIcon fontSize="small" />}
+                    variant="contained"
+                  >
+                    New Request
+                  </Button>
+                </NextLink>
               </Grid>
             </Grid>
           </Box>

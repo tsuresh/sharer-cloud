@@ -158,6 +158,7 @@ const DeviceList: NextPage = () => {
               <Grid item>
                 <Button
                   startIcon={<Refresh fontSize="small"/>}
+                  onClick={getDevices}
                   variant="contained"
                 >
                   Refresh

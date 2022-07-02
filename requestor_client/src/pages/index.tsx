@@ -10,9 +10,14 @@ import { HomeDesigners } from '../components/home/home-designers';
 import { HomeFeatures } from '../components/home/home-features';
 import { HomeTestimonials } from '../components/home/home-testimonials';
 import { gtm } from '../lib/gtm';
+import { useRouter } from 'next/router';
 
 const Home: NextPage = () => {
+
+  const router = useRouter();
+
   useEffect(() => {
+    router.push('/dashboard/requests').catch(console.error);
     gtm.push({ event: 'page_view' });
   }, []);
 

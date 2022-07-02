@@ -40,7 +40,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = (props) => {
           {children}
         </Box>
       </DashboardLayoutRoot>
-      <DashboardNavbar onOpenSidebar={(): void => setIsSidebarOpen(true)} />
+      {/* <DashboardNavbar onOpenSidebar={(): void => setIsSidebarOpen(true)} /> */}
       <DashboardSidebar
         onClose={(): void => setIsSidebarOpen(false)}
         open={isSidebarOpen}

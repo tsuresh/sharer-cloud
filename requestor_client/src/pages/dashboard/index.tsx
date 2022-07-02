@@ -31,11 +31,15 @@ import { InformationCircleOutlined as InformationCircleOutlinedIcon } from '../.
 import { Reports as ReportsIcon } from '../../icons/reports';
 import { Users as UsersIcon } from '../../icons/users';
 import { gtm } from '../../lib/gtm';
+import { useRouter } from 'next/router';
 
 const Overview: NextPage = () => {
   const [displayBanner, setDisplayBanner] = useState<boolean>(true);
 
+  const router = useRouter();
+
   useEffect(() => {
+    router.push('/dashboard/requests').catch(console.error);
     gtm.push({ event: 'page_view' });
   }, []);
 
