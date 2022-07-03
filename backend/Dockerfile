@@ -36,5 +36,9 @@ ENV FLASK_DEBUG=1
 ENV FLASK_ENV=development
 ENV FLASK_APP=main.py
 
+# Make tmp directory
+RUN mkdir tmp
+RUN chmod 777 tmp
+
 # Set python entrypoint
 ENTRYPOINT ["/bin/bash", "/start.sh"]

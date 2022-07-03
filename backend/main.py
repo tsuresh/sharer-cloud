@@ -296,6 +296,9 @@ def upload():
                 "url" : f"https://storage.googleapis.com/sharer-cloud-dev.appspot.com/{str(result)}",
                 "message" : "success"
             }
+
+            print("Upload success")
+
             return jsonify(response_content)
     except Exception as e:
         response_content = {
@@ -303,6 +306,9 @@ def upload():
             "message" : "error",
             "detail" : str(e)
         }
+
+        print(str(e))
+
         return jsonify(response_content)
 
 if __name__ == '__main__':

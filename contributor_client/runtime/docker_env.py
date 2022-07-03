@@ -32,6 +32,9 @@ def create(name: str, image: str, envars: list, deployCmd: str, configs: object)
                 'RUNQ_MEM' : int(configs.mem_limit),
                 'RUNQ_CPU' : int(configs.cpu_count)
             },
+            extra_hosts = {
+                'host.docker.internal' : 'host-gateway' #Only for testing
+            },
             labels= [containerLabel],
             runtime="runq"
         )
