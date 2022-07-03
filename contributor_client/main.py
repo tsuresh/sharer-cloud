@@ -4,7 +4,7 @@ import workloads
 import uuid
 from types import SimpleNamespace
 
-device_token = uuid.uuid4()
+device_token = str(uuid.uuid4())
 
 # standard Python
 sio = socketio.Client()

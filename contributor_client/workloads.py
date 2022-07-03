@@ -67,7 +67,7 @@ def checkMachineVacantStatus(config: object, sid=None, deviceToken=None):
             'token' : deviceToken,
             'machine_type' : config.machine_type,
             'contributor_id' : config.contributor_id,
-            'machine_name' : os.environ['COMPUTERNAME']
+            'machine_name' : config.machine_name
         }
 
     return {
@@ -77,7 +77,7 @@ def checkMachineVacantStatus(config: object, sid=None, deviceToken=None):
         'token' : deviceToken,
         'machine_type' : config.machine_type,
         'contributor_id' : config.contributor_id,
-        'machine_name' : os.environ['COMPUTERNAME']
+        'machine_name' : config.machine_name
     }
 
 def checkPlaceability(spec: str, config: object, workloadId=None, sid=None, deviceToken=None):

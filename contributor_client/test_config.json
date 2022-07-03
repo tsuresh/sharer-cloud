@@ -1,9 +1,10 @@
 {
     "contributor_id" : "1234",
-    "images" : ["busybox","alpine","ubuntu","intel/intel-optimized-ml:scikit-learn"],
+    "images" : ["intel/intel-optimized-ml:scikit-learn"],
     "cpu_count" : 1,
     "cpu_percent" : 100,
-    "mem_limit": "1g",
+    "mem_limit": 1024,
     "device_requests" : ["3dsnow"],
-    "machine_type" : "L2-DS"
+    "machine_type" : "L2-DS",
+    "machine_name" : "Suresh Ubuntu"
 }
